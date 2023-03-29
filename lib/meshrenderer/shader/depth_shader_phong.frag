@@ -7,7 +7,7 @@ in vec3 ViewDir;
 in vec3 v_L;
 in vec3 v_normal;
 
-layout (location = 0) uniform float uLightAmbientWeight;
+layout (location = 0) uniform float u_light_ambient_w;
 layout (location = 2) uniform float u_light_diffuse_w;
 layout (location = 3) uniform float u_light_specular_w;
 
@@ -26,14 +26,14 @@ void main(void) {
     vec3 specular = max(dot(R, ViewDir), 0.0) * v_color;
 
 
-    rgb = vec3(uLightAmbientWeight  * v_color +
+    rgb = vec3(u_light_ambient_w  * v_color + 
                u_light_diffuse_w  * diffuse +
                u_light_specular_w * specular);
 
     if(rgb.x > 1.0) rgb.x = 1.0;
     if(rgb.y > 1.0) rgb.y = 1.0;
     if(rgb.z > 1.0) rgb.z = 1.0;
-    rgb_normals = vec3(Normal * 0.5 + 0.5); // transforms from [-1,1] to [0,1]
+    rgb_normals = vec3(Normal * 0.5 + 0.5); // transforms from [-1,1] to [0,1]  
     depth = v_view.z;
 }
 
@@ -64,3 +64,8 @@ void main(void) {
     vec3 rgb_color = hsv2rgb(hsv_color); */
 
     //rgb = light_w * rgb_color;
+    
+
+
+
+

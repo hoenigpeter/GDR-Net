@@ -58,17 +58,10 @@ class Lookahead(Optimizer):
         slow_state = {(id(k) if isinstance(k, torch.Tensor) else k): v for k, v in self.state.items()}
         fast_state = fast_state_dict["state"]
         param_groups = fast_state_dict["param_groups"]
-        return {
-            "state": fast_state,
-            "slow_state": slow_state,
-            "param_groups": param_groups,
-        }
+        return {"state": fast_state, "slow_state": slow_state, "param_groups": param_groups}
 
     def load_state_dict(self, state_dict):
-        fast_state_dict = {
-            "state": state_dict["state"],
-            "param_groups": state_dict["param_groups"],
-        }
+        fast_state_dict = {"state": state_dict["state"], "param_groups": state_dict["param_groups"]}
         self.base_optimizer.load_state_dict(fast_state_dict)
 
         # We want to restore the slow state, but share param_groups reference

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging as log
 import os
-from OpenGL.GL import *  # noqa:F403
+
+from OpenGL.GL import *
+
 import cyglfw3 as glfw
 
 

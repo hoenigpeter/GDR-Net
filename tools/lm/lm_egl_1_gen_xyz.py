@@ -104,10 +104,6 @@ class XyzGen(object):
         print(gt_path)
         assert osp.exists(gt_path)
 
-        #gt_path = osp.join(data_dir, "000000/scene_gt.json")
-
-
-
         gt_dict = mmcv.load(gt_path)
         for str_im_id, annos in tqdm(gt_dict.items()):
             int_im_id = int(str_im_id)

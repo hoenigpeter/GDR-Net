@@ -1,13 +1,10 @@
 import os
 import sys
 import os.path as osp
-import mmcv
+
 import cv2
-import warnings
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.collections import PatchCollection
-from matplotlib.patches import Polygon
 import numpy as np
 from matplotlib.patches import Polygon
 from mmcv import color_val
@@ -18,6 +15,7 @@ sys.path.insert(0, osp.join(cur_dir, "../.."))
 
 from lib.pysixd import misc as misc_6d
 from lib.utils import logger, mask_utils
+from lib.utils.fs import execute_only_once, mkdir_p
 from lib.utils.mask_utils import mask2bbox_xyxy
 from lib.utils.utils import dprint
 
@@ -62,7 +60,7 @@ def grid_show(ims, titles=None, row=1, col=3, dpi=200, save_path=None, title_fon
         plt.show()
     else:
         if save_path is not None:
-            mmcv.mkdir_or_exist(osp.dirname(save_path))
+            mkdir_p(osp.dirname(save_path))
             plt.savefig(save_path)
     return fig
 
@@ -100,6 +98,7 @@ def vis_bbox_opencv(img, bbox, thick=1, fmt="xywh", bbox_color="green"):
 
 
 def vis_image_mask_cv2(img, mask, color=None):
+    # import pycocotools.mask as cocomask
     if color is None:
         color_mask = np.random.randint(0, 256, (1, 3), dtype=np.uint8)
     else:
@@ -117,6 +116,7 @@ def vis_image_mask_bbox_cv2(
     """
     bboxes: xyxy
     """
+    # import pycocotools.mask as cocomask
     text_color = color_val(text_color)
     img_show = img.copy()
     for i, mask in enumerate(masks):
@@ -169,23 +169,11 @@ def vis_image_bboxes_cv2(
         cv2.rectangle(img_show, (x1, y1), (x2, y2), box_color, thickness=box_thickness)
         if draw_center:
             center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
-            img_show = cv2.circle(
-                img_show,
-                center,
-                radius=box_thickness,
-                color=box_color,
-                thickness=-1,
-            )
+            img_show = cv2.circle(img_show, center, radius=box_thickness, color=box_color, thickness=-1)
         if labels is not None:
             label_text = labels[i]
             cv2.putText(
-                img_show,
-                label_text,
-                (x1, y1 - 2),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                font_scale,
-                text_color,
-                font_thickness,
+                img_show, label_text, (x1, y1 - 2), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, font_thickness
             )
     return img_show
 
@@ -219,17 +207,10 @@ def vis_image_mask_plt(im, mask, dpi=200, color=None, outfile=None, show=True):
     _, contour, hier = cv2.findContours(e.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
     for c in contour:
-        polygon = Polygon(
-            c.reshape((-1, 2)),
-            fill=True,
-            facecolor=color_mask,
-            edgecolor="w",
-            linewidth=1.2,
-            alpha=0.5,
-        )
+        polygon = Polygon(c.reshape((-1, 2)), fill=True, facecolor=color_mask, edgecolor="w", linewidth=1.2, alpha=0.5)
         ax.add_patch(polygon)
     if outfile is not None:
-        mmcv.mkdir_or_exist(os.path.dirname(outfile))
+        mkdir_p(os.path.dirname(outfile))
         fig.savefig(outfile, dpi=dpi)
         plt.close("all")
     if show:
@@ -343,15 +324,7 @@ def imshow(img, win_name="", wait_time=0):
 
 
 def imshow_bboxes(
-    img,
-    bboxes,
-    colors="green",
-    top_k=-1,
-    thickness=1,
-    show=True,
-    win_name="",
-    wait_time=0,
-    out_file=None,
+    img, bboxes, colors="green", top_k=-1, thickness=1, show=True, win_name="", wait_time=0, out_file=None
 ):
     """Draw bboxes on an image.
 
@@ -392,74 +365,45 @@ def imshow_bboxes(
         imwrite(img, out_file)
 
 
-def color_val_matplotlib(color):
-    """Convert various input in BGR order to normalized RGB matplotlib color
-    tuples,
-    Args:
-        color (:obj:`Color`/str/tuple/int/ndarray): Color inputs
-    Returns:
-        tuple[float]: A tuple of 3 normalized floats indicating RGB channels.
-    """
-    color = mmcv.color_val(color)
-    color = [color / 255 for color in color[::-1]]
-    return tuple(color)
-
-
 def imshow_det_bboxes(
     img,
     bboxes,
     labels,
-    segms=None,
     class_names=None,
     score_thr=0,
     bbox_color="green",
     text_color="green",
-    mask_color=None,
-    thickness=2,
+    thickness=1,
     font_scale=0.5,
-    font_size=13,
-    win_name="",
-    fig_size=(15, 10),
     show=True,
+    win_name="",
     wait_time=0,
     out_file=None,
+    vis_tool="matplotlib",
 ):
     """Draw bboxes and class labels (with scores) on an image.
 
     Args:
         img (str or ndarray): The image to be displayed.
-        bboxes (ndarray): Bounding boxes (with scores), xyxy format, shaped (n, 4) or
+        bboxes (ndarray): Bounding boxes (with scores), shaped (n, 4) or
             (n, 5).
         labels (ndarray): Labels of bboxes.
-        segms (ndarray or None): Masks, shaped (n,h,w) or None
         class_names (list[str]): Names of each classes.
-        score_thr (float): Minimum score of bboxes to be shown.  Default: 0
-        bbox_color (str or tuple(int) or :obj:`Color`):Color of bbox lines.
-           The tuple of color should be in BGR order. Default: 'green'
-        text_color (str or tuple(int) or :obj:`Color`):Color of texts.
-           The tuple of color should be in BGR order. Default: 'green'
-        mask_color (None or str or tuple(int) or :obj:`Color`):
-           Color of masks. The tuple of color should be in BGR order.
-           Default: None
-        thickness (int): Thickness of lines. Default: 2
-        font_scale (float): Font scales of texts. Default: 0.5
-        font_size (int): Font size of texts. Default: 13
-        show (bool): Whether to show the image. Default: True
-        win_name (str): The window name. Default: ''
-        fig_size (tuple): Figure size of the pyplot figure. Default: (15, 10)
-        wait_time (float): Value of waitKey param. Default: 0.
-        out_file (str or None): The filename to write the image. Default: None
-    Returns:
-        ndarray: The image with bboxes drawn on it.
+        score_thr (float): Minimum score of bboxes to be shown.
+        bbox_color (str or tuple or :obj:`Color`): Color of bbox lines.
+        text_color (str or tuple or :obj:`Color`): Color of texts.
+        thickness (int): Thickness of lines.
+        font_scale (float): Font scales of texts.
+        show (bool): Whether to show the image.
+        win_name (str): The window name.
+        wait_time (int): Value of waitKey param.
+        out_file (str or None): The filename to write the image.
     """
-    warnings.warn('"font_scale" will be deprecated in v2.9.0,' 'Please use "font_size"')
-    assert bboxes.ndim == 2, f" bboxes ndim should be 2, but its ndim is {bboxes.ndim}."
-    assert labels.ndim == 1, f" labels ndim should be 1, but its ndim is {labels.ndim}."
-    assert bboxes.shape[0] == labels.shape[0], "bboxes.shape[0] and labels.shape[0] should have the same length."
-    assert (
-        bboxes.shape[1] == 4 or bboxes.shape[1] == 5
-    ), f" bboxes.shape[1] should be 4 or 5, but its {bboxes.shape[1]}."
-    img = mmcv.imread(img).copy()
+    assert bboxes.ndim == 2
+    assert labels.ndim == 1
+    assert bboxes.shape[0] == labels.shape[0]
+    assert bboxes.shape[1] == 4 or bboxes.shape[1] == 5
+    img = imread(img)
 
     if score_thr > 0:
         assert bboxes.shape[1] == 5
@@ -467,83 +411,32 @@ def imshow_det_bboxes(
         inds = scores > score_thr
         bboxes = bboxes[inds, :]
         labels = labels[inds]
-        if segms is not None:
-            segms = segms[inds, ...]
 
-    mask_colors = []
-    if labels.shape[0] > 0:
-        if mask_color is None:
-            # random color
-            np.random.seed(42)
-            mask_colors = [np.random.randint(0, 256, (1, 3), dtype=np.uint8) for _ in range(max(labels) + 1)]
-        else:
-            # specify  color
-            mask_colors = [np.array(mmcv.color_val(mask_color)[::-1], dtype=np.uint8)] * (max(labels) + 1)
+    bbox_color = color_val(bbox_color)
+    text_color = color_val(text_color)
 
-    bbox_color = color_val_matplotlib(bbox_color)
-    text_color = color_val_matplotlib(text_color)
-
-    img = mmcv.bgr2rgb(img)
-    img = np.ascontiguousarray(img)
-
-    plt.figure(figsize=fig_size)
-    plt.title(win_name)
-    plt.axis("off")
-    ax = plt.gca()
-
-    polygons = []
-    color = []
-    for i, (bbox, label) in enumerate(zip(bboxes, labels)):
+    for bbox, label in zip(bboxes, labels):
         bbox_int = bbox.astype(np.int32)
-        poly = [
-            [bbox_int[0], bbox_int[1]],
-            [bbox_int[0], bbox_int[3]],
-            [bbox_int[2], bbox_int[3]],
-            [bbox_int[2], bbox_int[1]],
-        ]
-        np_poly = np.array(poly).reshape((4, 2))
-        polygons.append(Polygon(np_poly))
-        color.append(bbox_color)
-        label_text = class_names[label] if class_names is not None else f"class {label}"
+        left_top = (bbox_int[0], bbox_int[1])
+        right_bottom = (bbox_int[2], bbox_int[3])
+        cv2.rectangle(img, left_top, right_bottom, bbox_color, thickness=thickness)
+        label_text = class_names[label] if class_names is not None else "cls {}".format(label)
         if len(bbox) > 4:
-            label_text += f"|{bbox[-1]:.02f}"
-        ax.text(
-            bbox_int[0],
-            bbox_int[1],
-            f"{label_text}",
-            bbox={
-                "facecolor": "black",
-                "alpha": 0.8,
-                "pad": 0.7,
-                "edgecolor": "none",
-            },
-            color=text_color,
-            fontsize=font_size,
-            verticalalignment="top",
-            horizontalalignment="left",
-        )
-        if segms is not None:
-            color_mask = mask_colors[labels[i]]
-            mask = segms[i].astype(bool)
-            img[mask] = img[mask] * 0.5 + color_mask * 0.5
+            label_text += "|{:.02f}".format(bbox[-1])
+        cv2.putText(img, label_text, (bbox_int[0], bbox_int[1] - 2), cv2.FONT_HERSHEY_COMPLEX, font_scale, text_color)
 
-    plt.imshow(img)
-
-    p = PatchCollection(polygons, facecolor="none", edgecolors=color, linewidths=thickness)
-    ax.add_collection(p)
-
-    if out_file is not None:
-        dir_name = osp.abspath(osp.dirname(out_file))
-        mmcv.mkdir_or_exist(dir_name)
-        plt.savefig(out_file)
     if show:
-        if wait_time == 0:
+        if vis_tool == "matplotlib":
+            fig = plt.figure(frameon=False, figsize=(8, 6), dpi=100)
+            tmp = fig.add_subplot(1, 1, 1)
+            tmp.set_title("{}".format(win_name))
+            plt.axis("off")
+            plt.imshow(img[:, :, [2, 1, 0]])
             plt.show()
-        else:
-            plt.show(block=False)
-            plt.pause(wait_time)
-            plt.close()
-    return mmcv.rgb2bgr(img)
+        else:  # use 'mmcv'
+            imshow(img, win_name, wait_time)
+    if out_file is not None:
+        imwrite(img, out_file)
 
 
 def imshow_det_bboxes_poses(
@@ -632,14 +525,7 @@ def imshow_det_bboxes_poses(
         label_text = class_names[label] if class_names is not None else "cls {}".format(label)
         if len(bbox) > 4:
             label_text += "|{:.02f}".format(bbox[-1])
-        cv2.putText(
-            img,
-            label_text,
-            (bbox_int[0], bbox_int[1] - 2),
-            cv2.FONT_HERSHEY_COMPLEX,
-            font_scale,
-            text_color,
-        )
+        cv2.putText(img, label_text, (bbox_int[0], bbox_int[1] - 2), cv2.FONT_HERSHEY_COMPLEX, font_scale, text_color)
 
     if show:
         if vis_tool == "matplotlib":

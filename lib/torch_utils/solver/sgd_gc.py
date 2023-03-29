@@ -7,15 +7,7 @@ from torch.optim.optimizer import Optimizer, required
 class SGD_GCC(Optimizer):
     """for conv layers only."""
 
-    def __init__(
-        self,
-        params,
-        lr=required,
-        momentum=0,
-        dampening=0,
-        weight_decay=0,
-        nesterov=False,
-    ):
+    def __init__(self, params, lr=required, momentum=0, dampening=0, weight_decay=0, nesterov=False):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -23,13 +15,7 @@ class SGD_GCC(Optimizer):
         if weight_decay < 0.0:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
 
-        defaults = dict(
-            lr=lr,
-            momentum=momentum,
-            dampening=dampening,
-            weight_decay=weight_decay,
-            nesterov=nesterov,
-        )
+        defaults = dict(lr=lr, momentum=momentum, dampening=dampening, weight_decay=weight_decay, nesterov=nesterov)
         if nesterov and (momentum <= 0 or dampening != 0):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super(SGD_GCC, self).__init__(params, defaults)
@@ -66,14 +52,7 @@ class SGD_GCC(Optimizer):
 
                 # GC operation for Conv layers
                 if len(list(d_p.size())) > 3:
-                    d_p.add_(
-                        -(
-                            d_p.mean(
-                                dim=tuple(range(1, len(list(d_p.size())))),
-                                keepdim=True,
-                            )
-                        )
-                    )
+                    d_p.add_(-d_p.mean(dim=tuple(range(1, len(list(d_p.size())))), keepdim=True))
 
                 if momentum != 0:
                     param_state = self.state[p]
@@ -95,15 +74,7 @@ class SGD_GCC(Optimizer):
 class SGD_GC(Optimizer):
     """for conv and fc."""
 
-    def __init__(
-        self,
-        params,
-        lr=required,
-        momentum=0,
-        dampening=0,
-        weight_decay=0,
-        nesterov=False,
-    ):
+    def __init__(self, params, lr=required, momentum=0, dampening=0, weight_decay=0, nesterov=False):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -111,13 +82,7 @@ class SGD_GC(Optimizer):
         if weight_decay < 0.0:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
 
-        defaults = dict(
-            lr=lr,
-            momentum=momentum,
-            dampening=dampening,
-            weight_decay=weight_decay,
-            nesterov=nesterov,
-        )
+        defaults = dict(lr=lr, momentum=momentum, dampening=dampening, weight_decay=weight_decay, nesterov=nesterov)
         if nesterov and (momentum <= 0 or dampening != 0):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super(SGD_GC, self).__init__(params, defaults)
@@ -154,14 +119,7 @@ class SGD_GC(Optimizer):
 
                 # GC operation for Conv layers and FC layers
                 if len(list(d_p.size())) > 1:
-                    d_p.add_(
-                        -(
-                            d_p.mean(
-                                dim=tuple(range(1, len(list(d_p.size())))),
-                                keepdim=True,
-                            )
-                        )
-                    )
+                    d_p.add_(-d_p.mean(dim=tuple(range(1, len(list(d_p.size())))), keepdim=True))
 
                 if momentum != 0:
                     param_state = self.state[p]
@@ -181,15 +139,7 @@ class SGD_GC(Optimizer):
 
 
 class SGDW(Optimizer):
-    def __init__(
-        self,
-        params,
-        lr=required,
-        momentum=0,
-        dampening=0,
-        weight_decay=0,
-        nesterov=False,
-    ):
+    def __init__(self, params, lr=required, momentum=0, dampening=0, weight_decay=0, nesterov=False):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -197,13 +147,7 @@ class SGDW(Optimizer):
         if weight_decay < 0.0:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
 
-        defaults = dict(
-            lr=lr,
-            momentum=momentum,
-            dampening=dampening,
-            weight_decay=weight_decay,
-            nesterov=nesterov,
-        )
+        defaults = dict(lr=lr, momentum=momentum, dampening=dampening, weight_decay=weight_decay, nesterov=nesterov)
         if nesterov and (momentum <= 0 or dampening != 0):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super(SGDW, self).__init__(params, defaults)
@@ -260,15 +204,7 @@ class SGDW(Optimizer):
 
 
 class SGDW_GCC(Optimizer):
-    def __init__(
-        self,
-        params,
-        lr=required,
-        momentum=0,
-        dampening=0,
-        weight_decay=0,
-        nesterov=False,
-    ):
+    def __init__(self, params, lr=required, momentum=0, dampening=0, weight_decay=0, nesterov=False):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
@@ -276,13 +212,7 @@ class SGDW_GCC(Optimizer):
         if weight_decay < 0.0:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
 
-        defaults = dict(
-            lr=lr,
-            momentum=momentum,
-            dampening=dampening,
-            weight_decay=weight_decay,
-            nesterov=nesterov,
-        )
+        defaults = dict(lr=lr, momentum=momentum, dampening=dampening, weight_decay=weight_decay, nesterov=nesterov)
         if nesterov and (momentum <= 0 or dampening != 0):
             raise ValueError("Nesterov momentum requires a momentum and zero dampening")
         super(SGDW_GCC, self).__init__(params, defaults)
@@ -320,14 +250,7 @@ class SGDW_GCC(Optimizer):
 
                 # GC operation for Conv layers
                 if len(list(d_p.size())) > 3:
-                    d_p.add_(
-                        -(
-                            d_p.mean(
-                                dim=tuple(range(1, len(list(d_p.size())))),
-                                keepdim=True,
-                            )
-                        )
-                    )
+                    d_p.add_(-d_p.mean(dim=tuple(range(1, len(list(d_p.size())))), keepdim=True))
 
                 if momentum != 0:
                     param_state = self.state[p]

@@ -26,6 +26,10 @@ def _get_optimizer(params, optimizer_cfg, use_hvd=False):
         from lib.torch_utils.solver.ralamb import Ralamb
 
         optimizer_cls = Ralamb
+    elif optim_type == "RAdam":
+        from lib.torch_utils.solver.radam import RAdam
+
+        optimizer_cls = RAdam
     else:
         optimizer_cls = getattr(torch.optim, optim_type)
     opt_kwargs = {k: v for k, v in optimizer_cfg.items() if "lookahead" not in k}
@@ -37,9 +41,7 @@ def _get_optimizer(params, optimizer_cfg, use_hvd=False):
 
             # TODO: pass lookahead hyper-params
             optimizer = Lookahead(
-                optimizer,
-                alpha=optimizer_cfg.get("lookahead_alpha", 0.5),
-                k=optimizer_cfg.get("lookahead_k", 6),
+                optimizer, alpha=optimizer_cfg.get("lookahead_alpha", 0.5), k=optimizer_cfg.get("lookahead_k", 6)
             )
     # logger.info(msg(type(optimizer)))
     return optimizer
@@ -85,10 +87,7 @@ def build_optimizer(model, optimizer_cfg, cfg=None, use_hvd=False):
             base_params = [p for p_n, p in model.named_parameters() if "emb_head" not in p_n]
             active_params = [p for p_n, p in model.named_parameters() if "emb_head" in p_n]
             params = [
-                {
-                    "params": base_params,
-                    "lr": cfg.ref.slow_base_ratio * optimizer_cfg["lr"],
-                },
+                {"params": base_params, "lr": cfg.ref.slow_base_ratio * optimizer_cfg["lr"]},
                 {"params": active_params},
             ]
             return _get_optimizer(params, optimizer_cfg, use_hvd=use_hvd)
@@ -124,7 +123,7 @@ def build_optimizer(model, optimizer_cfg, cfg=None, use_hvd=False):
                 if base_wd is not None:
                     param_group["weight_decay"] = base_wd * bias_decay_mult
 
-            # NOTE: add by wg
+            # NOTE: add
             if cfg is not None and "train" in cfg and cfg.train.get("slow_base", False):
                 if "emb_head" not in name:  # backbone parameters
                     param_group["lr"] = cfg.ref.slow_base_ratio * base_lr
@@ -139,11 +138,7 @@ def clip_grad_norm(params, max_norm=35, norm_type=2):
     clip_grad_norm = {'max_norm': 35, 'norm_type': 2}
     slow down training
     """
-    clip_grad.clip_grad_norm_(
-        filter(lambda p: p.requires_grad, params),
-        max_norm=max_norm,
-        norm_type=norm_type,
-    )
+    clip_grad.clip_grad_norm_(filter(lambda p: p.requires_grad, params), max_norm=max_norm, norm_type=norm_type)
 
 
 def clip_grad_value(params, clip_value=10):

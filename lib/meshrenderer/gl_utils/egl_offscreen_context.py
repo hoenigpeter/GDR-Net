@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
-from lib.utils import logger
 import os
 from ctypes import pointer
 
 if not os.environ.get("PYOPENGL_PLATFORM"):
     os.environ["PYOPENGL_PLATFORM"] = "egl"
+
 
 from OpenGL.GL import *
 from OpenGL.EGL import (
@@ -43,6 +43,8 @@ class OffscreenContext(object):
     def __init__(self):
         config_attributes = arrays.GLintArray.asArray(
             [
+                EGL_SURFACE_TYPE,
+                EGL_PBUFFER_BIT,
                 EGL_BLUE_SIZE,
                 8,
                 EGL_RED_SIZE,
@@ -51,8 +53,6 @@ class OffscreenContext(object):
                 8,
                 EGL_DEPTH_SIZE,
                 24,
-                EGL_SURFACE_TYPE,
-                EGL_PBUFFER_BIT,
                 EGL_COLOR_BUFFER_TYPE,
                 EGL_RGB_BUFFER,
                 EGL_RENDERABLE_TYPE,
@@ -89,13 +89,7 @@ class OffscreenContext(object):
 
         # Initialize EGL
         assert eglInitialize(self._egl_display, major, minor)
-        assert eglChooseConfig(
-            self._egl_display,
-            config_attributes,
-            pointer(configs),
-            1,
-            pointer(num_configs),
-        )
+        assert eglChooseConfig(self._egl_display, config_attributes, pointer(configs), 1, pointer(num_configs))
 
         # Bind EGL to the OpenGL API
         assert eglBindAPI(EGL_OPENGL_API)
@@ -115,12 +109,7 @@ class OffscreenContext(object):
     def make_current(self):
         from OpenGL.EGL import eglMakeCurrent, EGL_NO_SURFACE
 
-        assert eglMakeCurrent(
-            self._egl_display,
-            EGL_NO_SURFACE,
-            EGL_NO_SURFACE,
-            self._egl_context,
-        )
+        assert eglMakeCurrent(self._egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, self._egl_context)
 
     def close(self):
         self.delete_context()

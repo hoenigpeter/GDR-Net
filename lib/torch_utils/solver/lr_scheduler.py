@@ -1,9 +1,10 @@
 import types
 from bisect import bisect_right
-import warnings
+
 import torch
 from torch.optim import Optimizer
 from math import pi, cos
+from lib.utils import logger
 
 
 def build_scheduler(lr_config, optimizer, epoch_length):
@@ -26,14 +27,7 @@ def build_scheduler(lr_config, optimizer, epoch_length):
     epoch_length: len(train_loader)
     """
     policy = lr_config["policy"]
-    assert policy in (
-        "flat_and_anneal",
-        "linear",
-        "step",
-        "poly",
-        "multistep",
-        "warmup_multistep",
-    )
+    assert policy in ("flat_and_anneal", "linear", "step", "poly", "multistep", "warmup_multistep")
     total_iters = lr_config["epochs"] * epoch_length
 
     # update_mode = 'epoch' if lr_config.get('by_epoch', False) else 'batch'
@@ -88,8 +82,7 @@ def build_scheduler(lr_config, optimizer, epoch_length):
         #     count = lr_config["epochs"]
         count = total_iters
         scheduler = torch.optim.lr_scheduler.LambdaLR(
-            optimizer,
-            lambda it: (1 - float(it) / count) ** lr_config["poly_power"],
+            optimizer, lambda it: (1 - float(it) / count) ** lr_config["poly_power"]
         )
     elif policy == "multistep":
         milestones = [_step * total_iters for _step in lr_config["steps"]]
@@ -100,6 +93,45 @@ def build_scheduler(lr_config, optimizer, epoch_length):
             "valid options: 'flat_and_anneal', 'linear', 'step', 'poly', 'multistep'".format(policy)
         )
     return scheduler
+
+
+def warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor, warmup_method="linear"):
+    # https://github.com/pytorch/vision/blob/master/references/detection/engine.py
+    """
+    # in epoch 0:
+    lr_scheduler = None
+    if epoch == 0:
+        warmup_factor = 1. / 1000
+        warmup_iters = min(1000, len(data_loader) - 1)
+
+        lr_scheduler = utils.warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor)
+
+    # in one epoch:
+    optimizer.zero_grad()
+        losses.backward()
+        optimizer.step()
+
+        if lr_scheduler is not None:
+            lr_scheduler.step()
+    # iter < warmup_iters: use this scheduler
+    # iter >= warmup_iters: use whatever scheduler
+    # if warmup is not only happen in epoch 0,
+    # convert the other's to be based on iters other than epochs
+    """
+    if warmup_method not in ("constant", "linear"):
+        raise ValueError("Only 'constant' or 'linear' warmup_method accepted" "got {}".format(warmup_method))
+
+    def f(x):  # x is the iter in lr scheduler
+        # the final lr is warmup_factor * base_lr
+        if x >= warmup_iters:
+            return 1
+        if warmup_method == "linear":
+            alpha = float(x) / warmup_iters
+            return warmup_factor * (1 - alpha) + alpha
+        elif warmup_method == "constant":
+            return warmup_factor
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, f)
 
 
 class WarmupMultiStepLR(torch.optim.lr_scheduler._LRScheduler):
@@ -114,10 +146,7 @@ class WarmupMultiStepLR(torch.optim.lr_scheduler._LRScheduler):
         last_epoch=-1,
     ):
         if not milestones == sorted(milestones):
-            raise ValueError(
-                "Milestones should be a list of" " increasing integers. Got {}",
-                milestones,
-            )
+            raise ValueError("Milestones should be a list of" " increasing integers. Got {}", milestones)
 
         if warmup_method not in ("constant", "linear"):
             raise ValueError("Only 'constant' or 'linear' warmup_method accepted" "got {}".format(warmup_method))
@@ -151,35 +180,23 @@ def flat_and_anneal_lr_scheduler(
     warmup_iters=0,
     warmup_factor=0.1,
     warmup_method="linear",
-    warmup_pow=2,
     anneal_point=0.72,
     anneal_method="cosine",
     target_lr_factor=0,
     poly_power=1.0,
     step_gamma=0.1,
     steps=[2 / 3.0, 8 / 9.0],
-    cyclic=False,
-    return_function=False,
 ):
-    """Ref: https://github.com/fastai/fastai/blob/master/fastai/callbacks/flat_cos_anneal.py.
+    """https://github.com/fastai/fastai/blob/master/fastai/callbacks/flat_cos_a
+    nneal.py.
 
     warmup_initial_lr = warmup_factor * base_lr
     target_lr = base_lr * target_lr_factor
-    total_iters: cycle length; set to max_iter to get a one cycle schedule.
     """
-    if warmup_method not in ("constant", "linear", "pow", "exp"):
-        raise ValueError(
-            "Only 'constant', 'linear', 'pow' or 'exp' warmup_method accepted," "got {}".format(warmup_method)
-        )
+    if warmup_method not in ("constant", "linear"):
+        raise ValueError("Only 'constant' or 'linear' warmup_method accepted," "got {}".format(warmup_method))
 
-    if anneal_method not in (
-        "cosine",
-        "linear",
-        "poly",
-        "exp",
-        "step",
-        "none",
-    ):
+    if anneal_method not in ("cosine", "linear", "poly", "exp", "step", "none"):
         raise ValueError(
             "Only 'cosine', 'linear', 'poly', 'exp', 'step' or 'none' anneal_method accepted,"
             "got {}".format(anneal_method)
@@ -189,16 +206,11 @@ def flat_and_anneal_lr_scheduler(
         if any([_step < warmup_iters / total_iters or _step > 1 for _step in steps]):
             raise ValueError(
                 "error in steps: {}. warmup_iters: {} total_iters: {}."
-                "steps should be in ({},1)".format(
-                    steps,
-                    warmup_iters,
-                    total_iters,
-                    warmup_iters / total_iters,
-                )
+                "steps should be in ({},1)".format(steps, warmup_iters, total_iters, warmup_iters / total_iters)
             )
         if list(steps) != sorted(steps):
             raise ValueError("steps {} is not in ascending order.".format(steps))
-        warnings.warn("ignore anneal_point when using step anneal_method")
+        logger.warning("ignore anneal_point when using step anneal_method")
         anneal_start = steps[0] * total_iters
     else:
         if anneal_point > 1 or anneal_point < 0:
@@ -207,24 +219,13 @@ def flat_and_anneal_lr_scheduler(
 
     def f(x):  # x is the iter in lr scheduler, return the lr_factor
         # the final lr is warmup_factor * base_lr
-        x = x % total_iters if cyclic else x  # cyclic
         if x < warmup_iters:
             if warmup_method == "linear":
                 alpha = float(x) / warmup_iters
-                return (1 - warmup_factor) * alpha + warmup_factor
-            elif warmup_method == "pow":
-                alpha = float(x) / warmup_iters
-                return (1 - warmup_factor) * pow(alpha, warmup_pow) + warmup_factor
-            elif warmup_method == "exp":
-                assert warmup_factor > 0, warmup_factor
-                alpha = float(x) / warmup_iters
-                return warmup_factor ** (1 - alpha)
+                return warmup_factor * (1 - alpha) + alpha
             elif warmup_method == "constant":
                 return warmup_factor
-
-        if x < anneal_start:
-            return 1
-        elif x >= anneal_start and x < total_iters:
+        elif x >= anneal_start:
             if anneal_method == "step":
                 # ignore anneal_point and target_lr_factor
                 milestones = [_step * total_iters for _step in steps]
@@ -256,13 +257,10 @@ def flat_and_anneal_lr_scheduler(
             else:
                 lr_factor = 1
             return lr_factor
-        elif x >= total_iters:
-            return target_lr_factor
+        else:  # warmup_iter <= x < anneal_start_iter
+            return 1
 
-    if return_function:
-        return torch.optim.lr_scheduler.LambdaLR(optimizer, f), f
-    else:
-        return torch.optim.lr_scheduler.LambdaLR(optimizer, f)
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, f)
 
 
 def update_learning_rate(optimizer, cur_lr, new_lr):
@@ -281,39 +279,47 @@ def update_learning_rate(optimizer, cur_lr, new_lr):
 
 
 def test_flat_and_anneal():
+    from mmcv import Config
     import numpy as np
 
     model = resnet18()
-    base_lr = 1e-4
-    optimizer_cfg = dict(type="Adam", lr=base_lr, weight_decay=0)
+
+    optimizer_cfg = dict(type="Adam", lr=1e-4, weight_decay=0)
     optimizer = obj_from_dict(optimizer_cfg, torch.optim, dict(params=model.parameters()))
 
     # learning policy
-    total_epochs = 300
+    total_epochs = 80
     epoch_len = 500
-    tail_flat_iters = 15 * epoch_len
-    total_iters = epoch_len * total_epochs - tail_flat_iters
+    total_iters = epoch_len * total_epochs
+    # poly, step, linear, exp, cosine
+    lr_cfg = Config(
+        dict(
+            anneal_method="cosine",
+            warmup_method="linear",
+            step_gamma=0.1,
+            warmup_factor=0.1,
+            warmup_iters=800,
+            poly_power=5,
+            target_lr_factor=0.0,
+            steps=[0.5, 0.75, 0.9],
+            anneal_point=0.72,
+        )
+    )
 
     # scheduler = build_scheduler(lr_config, optimizer, epoch_length)
-    scheduler_cfg = L(flat_and_anneal_lr_scheduler)(
+    scheduler = flat_and_anneal_lr_scheduler(
+        optimizer=optimizer,
         total_iters=total_iters,
-        warmup_method="pow",
-        warmup_pow=2,
-        warmup_factor=0.0,
-        warmup_iters=epoch_len * 5,
-        #
-        anneal_method="cosine",
-        anneal_point=5 / (total_epochs - 15),
-        # anneal_point=0.72,
-        step_gamma=0.1,
-        poly_power=5,
-        steps=[0.5, 0.75, 0.9],
-        #
-        target_lr_factor=0.05,
+        warmup_method=lr_cfg.warmup_method,
+        warmup_factor=lr_cfg.warmup_factor,
+        warmup_iters=lr_cfg.warmup_iters,
+        anneal_method=lr_cfg.anneal_method,
+        anneal_point=lr_cfg.anneal_point,
+        target_lr_factor=lr_cfg.target_lr_factor,
+        poly_power=lr_cfg.poly_power,
+        step_gamma=lr_cfg.step_gamma,
+        steps=lr_cfg.steps,
     )
-    scheduler_cfg.optimizer = optimizer
-    scheduler = instantiate(scheduler_cfg)
-
     print("start lr: {}".format(scheduler.get_lr()))
     steps = []
     lrs = []
@@ -321,7 +327,7 @@ def test_flat_and_anneal():
     epoch_lrs = []
     global_step = 0
 
-    start_epoch = 0
+    start_epoch = 20
     for epoch in range(start_epoch):
         for batch in range(epoch_len):
             scheduler.step()  # when no state_dict availble
@@ -345,20 +351,20 @@ def test_flat_and_anneal():
             scheduler.step()  # usually after optimizer.step()
     # print(epoch_lrs)
     # import pdb;pdb.set_trace()
-    # epoch_lrs.append([total_epochs, scheduler.get_lr()[0]])
+    epoch_lrs.append([total_epochs, scheduler.get_lr()[0]])
 
     epoch_lrs = np.asarray(epoch_lrs, dtype=np.float32)
     for i in range(len(epoch_lrs)):
         print("{:02d} {}".format(int(epoch_lrs[i][0]), epoch_lrs[i][1]))
 
-    plt.figure(dpi=100)
-    # plt.suptitle("{}".format(dict(lr_cfg)), size=4)
+    plt.figure(dpi=200)
+    plt.suptitle("{}".format(dict(lr_cfg)), size=4)
     plt.subplot(1, 2, 1)
-    plt.plot(steps, lrs, "-.")
+    plt.plot(steps, lrs)
     # plt.show()
     plt.subplot(1, 2, 2)
     # print(epoch_lrs.dtype)
-    plt.plot(epoch_lrs[:, 0], epoch_lrs[:, 1], "-.")
+    plt.plot(epoch_lrs[:, 0], epoch_lrs[:, 1])
     plt.show()
 
 
@@ -369,12 +375,9 @@ if __name__ == "__main__":
     import torch
     from torchvision.models import resnet18
     import matplotlib.pyplot as plt
-    from omegaconf import OmegaConf
-    from detectron2.config import LazyCall as L
-    from detectron2.config import LazyConfig, instantiate
 
     cur_dir = osp.dirname(osp.abspath(__file__))
-    sys.path.insert(0, osp.join(cur_dir, "../../.."))
+    sys.path.insert(0, osp.join(cur_dir, "../.."))
 
     test_flat_and_anneal()
     exit(0)

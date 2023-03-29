@@ -39,6 +39,7 @@ Run on multiple machines:
         "--resume", action="store_true", help="whether to attempt to resume from the checkpoint directory"
     )
     parser.add_argument("--eval-only", action="store_true", help="perform evaluation only")
+    parser.add_argument("--ros", action="store_true", help="use ros for service")
     # hvd ======
     parser.add_argument(
         "--use-hvd", action="store_true", default=False, help="use horovod for distributed/multi-gpu training"

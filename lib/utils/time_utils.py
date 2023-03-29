@@ -26,11 +26,8 @@ def my_timeit(func, number=100000):
     return time.perf_counter() - tic
 
 
-def get_time_str(fmt="%Y%m%d_%H%M%S", hours_offset=8):
-    # get UTC+8 time by default
-    # set hours_offset to 0 to get UTC time
-    # use utc time to avoid the problem of mis-configured timezone on some machines
-    return (datetime.utcnow() + timedelta(hours=hours_offset)).strftime(fmt)
+def get_time_str(fmt="%Y%m%d_%H%M%S"):
+    return datetime.now().strftime(fmt)
 
 
 # def get_time_str(fmt='%Y%m%d_%H%M%S'):

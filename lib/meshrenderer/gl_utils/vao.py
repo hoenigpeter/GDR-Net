@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from OpenGL import GL
+
+from OpenGL.GL import *
+
 from .ebo import EBO
 
 
 class VAO(object):
     def __init__(self, vbo_attrib, ebo=None):
         self.__id = np.empty(1, dtype=np.uint32)
-        GL.glCreateVertexArrays(len(self.__id), self.__id)
+        glCreateVertexArrays(len(self.__id), self.__id)
         i = 0
         for vbo_offset_stride, attribs in vbo_attrib.items():
             vbo = vbo_offset_stride[0]
@@ -19,23 +21,16 @@ class VAO(object):
                 attribtype = attrib[2]
                 normalized = attrib[3]
                 relativeoffset = attrib[4]
-                GL.glVertexArrayAttribFormat(
-                    self.__id,
-                    attribindex,
-                    size,
-                    attribtype,
-                    normalized,
-                    relativeoffset,
-                )
-                GL.glVertexArrayAttribBinding(self.__id, attribindex, i)
-                GL.glEnableVertexArrayAttrib(self.__id, attribindex)
-            GL.glVertexArrayVertexBuffer(self.__id, i, vbo.id, offset, stride)
+                glVertexArrayAttribFormat(self.__id, attribindex, size, attribtype, normalized, relativeoffset)
+                glVertexArrayAttribBinding(self.__id, attribindex, i)
+                glEnableVertexArrayAttrib(self.__id, attribindex)
+            glVertexArrayVertexBuffer(self.__id, i, vbo.id, offset, stride)
             i += 1
-        if ebo is not None:
+        if ebo != None:
             if isinstance(ebo, EBO):
-                GL.glVertexArrayElementBuffer(self.__id, ebo.id)
+                glVertexArrayElementBuffer(self.__id, ebo.id)
             else:
                 ValueError("Invalid EBO type.")
 
     def bind(self):
-        GL.glBindVertexArray(self.__id)
+        glBindVertexArray(self.__id)

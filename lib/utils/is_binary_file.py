@@ -105,20 +105,11 @@ def is_binary_string(bytes_to_check):
                 # happens only on Python 2.6
                 unicode(bytes_to_check, encoding=detected_encoding["encoding"])  # noqa
             decodable_as_unicode = True
-            logger.debug(
-                "success: decodable_as_unicode: " "%(decodable_as_unicode)r",
-                locals(),
-            )
+            logger.debug("success: decodable_as_unicode: " "%(decodable_as_unicode)r", locals())
         except LookupError:
-            logger.debug(
-                "failure: could not look up encoding %(encoding)s",
-                detected_encoding,
-            )
+            logger.debug("failure: could not look up encoding %(encoding)s", detected_encoding)
         except UnicodeDecodeError:
-            logger.debug(
-                "failure: decodable_as_unicode: " "%(decodable_as_unicode)r",
-                locals(),
-            )
+            logger.debug("failure: decodable_as_unicode: " "%(decodable_as_unicode)r", locals())
 
     logger.debug("failure: decodable_as_unicode: " "%(decodable_as_unicode)r", locals())
     if is_likely_binary:

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# flake8: noqa
+# -*- coding: UTF-8 -*-
 import cyglfw3 as glfw
 from OpenGL.GL import *
 from OpenGL.GL.NV.bindless_texture import *
@@ -7,14 +6,7 @@ from OpenGL.GL.NV.bindless_texture import *
 
 class Window(object):
     def __init__(
-        self,
-        window_width,
-        window_height,
-        samples=1,
-        window_title="",
-        monitor=1,
-        show_at_center=True,
-        offscreen=False,
+        self, window_width, window_height, samples=1, window_title="", monitor=1, show_at_center=True, offscreen=False
     ):
         self.window_title = window_title
         assert glfw.Init(), "Glfw Init failed!"

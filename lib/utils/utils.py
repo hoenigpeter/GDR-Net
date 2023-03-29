@@ -1,6 +1,4 @@
 # modified from tensorpack/utils/utils.py
-from collections.abc import Mapping
-from copy import deepcopy
 import os
 import os.path as osp
 import sys
@@ -16,14 +14,23 @@ import pickle
 import string
 from termcolor import colored
 from tqdm import tqdm
-from loguru import logger
+from . import logger
 import copy
 import functools
-from .time_utils import get_time_str
-
 
 cur_dir = osp.normpath(osp.abspath(osp.dirname(__file__)))
 PROJ_ROOT = osp.normpath(osp.join(cur_dir, "../../"))
+# __all__ = [
+#     "change_env",
+#     "get_rng",
+#     "fix_rng_seed",
+#     "get_tqdm",
+#     "execute_only_once",
+#     "humanize_time_delta",
+#     "get_time_str",
+#     "backup_path",
+#     "argsort_for_list",
+# ]
 
 
 def msg(*args, sep=" "):
@@ -45,27 +52,18 @@ def lazy_property(function):
     return decorator
 
 
-def iiprint(*args, **kwargs):
+def iprint(*args, **kwargs):
     # print_info
     if True:
         caller = getframeinfo(stack()[1][0])
         filename = osp.relpath(caller.filename, PROJ_ROOT)
         if len(caller.filename) < len(filename):
             filename = caller.filename
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "cyan")
+        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "yellow")
         print(date + " " + " ".join(map(str, args)), **kwargs)
 
 
-def iprint(*args, **kwargs):
-    # print_info, only basename
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.basename(caller.filename).split(".")[0]
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "cyan")
-        print(date + " " + " ".join(map(str, args)), **kwargs)
-
-
-def ddprint(*args, **kwargs):
+def dprint(*args, **kwargs):
     # print for debug
     if True:
         caller = getframeinfo(stack()[1][0])
@@ -76,53 +74,7 @@ def ddprint(*args, **kwargs):
         print(date + " " + colored("DBG ", "yellow", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
 
 
-def dprint(*args, **kwargs):
-    # print for debug, only basename
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.basename(caller.filename).split(".")[0]
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "yellow")
-        print(date + " " + colored("DBG ", "yellow", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
-
-
-def wwprint(*args, **kwargs):
-    # print for warn
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.relpath(caller.filename, PROJ_ROOT)
-        if len(caller.filename) < len(filename):
-            filename = caller.filename
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "magenta")
-        print(date + " " + colored("WRN ", "magenta", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
-
-
-def wprint(*args, **kwargs):
-    # print for warn, only basename
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.basename(caller.filename).split(".")[0]
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "magenta")
-        print(date + " " + colored("WRN ", "magenta", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
-
-
-def eeprint(*args, **kwargs):
-    # print for error
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.relpath(caller.filename, PROJ_ROOT)
-        if len(caller.filename) < len(filename):
-            filename = caller.filename
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "red")
-        print(date + " " + colored("ERR ", "red", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
-
-
-def eprint(*args, **kwargs):
-    # print for error, only basename
-    if True:
-        caller = getframeinfo(stack()[1][0])
-        filename = osp.basename(caller.filename).split(".")[0]
-        date = colored("[{}@{}:{}]".format(get_time_str("%m%d_%H%M%S"), filename, caller.lineno), "red")
-        print(date + " " + colored("ERR ", "red", attrs=["blink"]) + " ".join(map(str, args)), **kwargs)
+print_for_debug = dprint
 
 
 def update_cfg(base_cfg, update_cfg):
@@ -167,6 +119,15 @@ def backup_path(path, backup_name=None):
             backup_name = path + "." + get_time_str()
         shutil.move(path, backup_name)
         logger.info("Existing path '{}' backuped to '{}'".format(path, backup_name))  # noqa: F821, E501
+
+
+def get_time_str(fmt="%Y%m%d_%H%M%S"):
+    return datetime.now().strftime(fmt)
+
+
+# def get_time_str(fmt='%Y%m%d_%H%M%S'):
+#     # from mmcv.runner import get_time_str
+#     return time.strftime(fmt, time.localtime())  # defined in mmcv
 
 
 def send_email(subject, body, to):
@@ -364,29 +325,3 @@ def is_picklable(obj):
     except pickle.PicklingError:
         return False
     return True
-
-
-def dict_merge(*args, add_keys=True):
-    # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9#gistcomment-3305932
-    assert len(args) >= 2, "dict_merge requires at least two dicts to merge"
-    rtn_dct = deepcopy(args[0])
-    merge_dicts = args[1:]
-    for merge_dct in merge_dicts:
-        if add_keys is False:
-            merge_dct = {key: merge_dct[key] for key in set(rtn_dct).intersection(set(merge_dct))}
-        for k, v in merge_dct.items():
-            if k not in rtn_dct:
-                rtn_dct[k] = v
-            elif k in rtn_dct and type(v) != type(rtn_dct[k]):
-                raise TypeError(
-                    f"Overlapping keys exist with different types: original is {type(rtn_dct[k])}, new value is {type(v)}"
-                )
-            elif isinstance(rtn_dct[k], dict) and isinstance(merge_dct[k], Mapping):
-                rtn_dct[k] = dict_merge(rtn_dct[k], merge_dct[k], add_keys=add_keys)
-            elif isinstance(v, list):
-                for list_value in v:
-                    if list_value not in rtn_dct[k]:
-                        rtn_dct[k].append(list_value)
-            else:
-                rtn_dct[k] = v
-    return rtn_dct

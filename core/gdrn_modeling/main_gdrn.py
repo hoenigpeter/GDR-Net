@@ -120,6 +120,10 @@ class Lite(GDRN_Lite):
         if args.eval_only:
             MyCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS, resume=args.resume)
             return self.do_test(cfg, model)
+        
+        if args.ros:
+            MyCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS, resume=args.resume)
+            return self.do_ros(cfg, model)           
 
         self.do_train(cfg, args, model, optimizer, resume=args.resume)
         torch.multiprocessing.set_sharing_strategy("file_system")

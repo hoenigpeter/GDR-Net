@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
-
-cur_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(cur_dir))
 import glob
 
 import math
 import numpy as np
-from lib.meshrenderer.write_xml import *  # noqa:F403
+from .write_xml import *
 import lib.meshrenderer.meshrenderer as mr
 import lib.meshrenderer.meshrenderer_phong as mr_phong
 import cv2
 
-from lib.pysixd import view_sampler, transform
+from lib.pysixd import view_sampler
+from lib.pysixd import transform
 
 
 class SceneRenderer(object):
@@ -56,19 +53,11 @@ class SceneRenderer(object):
         print(len(self._voc_imgs))
         if model_type == "reconst":
             self._renderer = mr_phong.Renderer(
-                self._models_cad_files,
-                K=K,
-                samples=1,
-                vertex_tmp_store_folder=vertex_tmp_store_folder,
-                vertex_scale=vertex_scale,
+                self._models_cad_files, 1, vertex_tmp_store_folder=vertex_tmp_store_folder, vertex_scale=vertex_scale
             )
         elif model_type == "cad":
             self._renderer = mr.Renderer(
-                self._models_cad_files,
-                K=K,
-                samples=1,
-                vertex_tmp_store_folder=vertex_tmp_store_folder,
-                vertex_scale=vertex_scale,
+                self._models_cad_files, 1, vertex_tmp_store_folder=vertex_tmp_store_folder, vertex_scale=vertex_scale
             )
         else:
             print("unknown model_type, ", model_type)
@@ -82,10 +71,7 @@ class SceneRenderer(object):
         if self._min_num_objects_per_scene == self._max_num_objects_per_scene:
             N = self._min_num_objects_per_scene
         else:
-            N = np.random.randint(
-                self._min_num_objects_per_scene,
-                self._max_num_objects_per_scene + 1,
-            )
+            N = np.random.randint(self._min_num_objects_per_scene, self._max_num_objects_per_scene)
         views = np.random.choice(self.all_views, N)
         obj_is = np.random.choice(len(self._models_cad_files), N)
 
@@ -96,19 +82,16 @@ class SceneRenderer(object):
         for v in views:
             success = False
             while not success:
+
                 tz = np.random.triangular(
-                    self._radius - self._radius / 3,
-                    self._radius,
-                    self._radius + self._radius / 3,
+                    self._radius - self._radius / 3, self._radius, self._radius + self._radius / 3
                 )
 
                 tx = np.random.uniform(
-                    -0.35 * tz * self._width / self._K[0, 0],
-                    0.35 * tz * self._width / self._K[0, 0],
+                    -0.35 * tz * self._width / self._K[0, 0], 0.35 * tz * self._width / self._K[0, 0]
                 )
                 ty = np.random.uniform(
-                    -0.35 * tz * self._height / self._K[1, 1],
-                    0.35 * tz * self._height / self._K[1, 1],
+                    -0.35 * tz * self._height / self._K[1, 1], 0.35 * tz * self._height / self._K[1, 1]
                 )
 
                 t = np.array([tx, ty, tz])
@@ -116,13 +99,14 @@ class SceneRenderer(object):
                 t_norm = t / np.linalg.norm(t)
 
                 if len(ts_norm) > 0 and np.any(np.dot(np.array(ts_norm), t_norm.reshape(3, 1)) > 0.99):
-                    success = False  # too close
+                    success = False
+                    print("fail")
                 else:
                     ts_norm.append(t_norm)
                     ts.append(t)
                     Rs.append(R)
                     success = True
-        # TODO:fix this
+
         bgr, depth, bbs = self._renderer.render_many(
             obj_is,
             self._width,
@@ -138,6 +122,7 @@ class SceneRenderer(object):
         rand_voc = cv2.imread(self._voc_imgs[np.random.randint(len(self._voc_imgs))])
         rand_voc = cv2.resize(rand_voc, (self._width, self._height))
         rand_voc = rand_voc.astype(np.float32) / 255.0
+        # print bgr.max()
         bgr = bgr.astype(np.float32) / 255.0
 
         depth_three_chan = np.dstack((depth,) * 3)
@@ -149,16 +134,11 @@ class SceneRenderer(object):
             xmax = np.maximum(x, x + w)
             ymin = np.minimum(y, y + h)
             ymax = np.maximum(y, y + h)
-            obj_info.append(
-                {
-                    "id": obj_id,
-                    "bb": [int(xmin), int(ymin), int(xmax), int(ymax)],
-                }
-            )
+            obj_info.append({"id": obj_id, "bb": [int(xmin), int(ymin), int(xmax), int(ymax)]})
 
         bgr = (bgr * 255.0).astype(np.uint8)
 
-        if self._augmenters is not None:
+        if self._augmenters != None:
             bgr = self._augmenters.augment_image(bgr)
 
         return bgr, obj_info

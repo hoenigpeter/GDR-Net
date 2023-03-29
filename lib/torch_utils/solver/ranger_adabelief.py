@@ -28,24 +28,10 @@ def centralized_gradient(x, use_gc=True, gc_conv_only=False):
     if use_gc:
         if gc_conv_only:
             if len(list(x.size())) > 3:
-                x.add_(
-                    -(
-                        x.mean(
-                            dim=tuple(range(1, len(list(x.size())))),
-                            keepdim=True,
-                        )
-                    )
-                )
+                x.add_(-x.mean(dim=tuple(range(1, len(list(x.size())))), keepdim=True))
         else:
             if len(list(x.size())) > 1:
-                x.add_(
-                    -(
-                        x.mean(
-                            dim=tuple(range(1, len(list(x.size())))),
-                            keepdim=True,
-                        )
-                    )
-                )
+                x.add_(-x.mean(dim=tuple(range(1, len(list(x.size())))), keepdim=True))
     return x
 
 
@@ -181,11 +167,7 @@ class RangerAdaBelief(Optimizer):
                 # if grad.dim() > self.gc_gradient_threshold:
                 #    grad.add_(-grad.mean(dim=tuple(range(1, grad.dim())), keepdim=True))
                 if self.gc_loc:
-                    grad = centralized_gradient(
-                        grad,
-                        use_gc=self.use_gc,
-                        gc_conv_only=self.gc_conv_only,
-                    )
+                    grad = centralized_gradient(grad, use_gc=self.use_gc, gc_conv_only=self.gc_conv_only)
 
                 state["step"] += 1
 
@@ -242,11 +224,7 @@ class RangerAdaBelief(Optimizer):
 
                 # GC operation
                 if self.gc_loc == False:
-                    G_grad = centralized_gradient(
-                        G_grad,
-                        use_gc=self.use_gc,
-                        gc_conv_only=self.gc_conv_only,
-                    )
+                    G_grad = centralized_gradient(G_grad, use_gc=self.use_gc, gc_conv_only=self.gc_conv_only)
 
                 p_data_fp32.add_(G_grad, alpha=-step_size * group["lr"])
 

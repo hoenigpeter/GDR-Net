@@ -330,7 +330,7 @@ SPLITS_LM_PBR = dict(
     ),
 )
 
-# single obj splits
+""" # single obj splits
 for obj in ref.lm_full.objects:
     for split in ["train"]:
         name = "lm_pbr_{}_{}".format(obj, split)
@@ -357,12 +357,12 @@ for obj in ref.lm_full.objects:
                 num_to_load=-1,
                 filter_invalid=filter_invalid,
                 ref_key="lm_full",
-            )
+            ) """
 
 # lmo single objs
 for obj in ref.lmo_full.objects:
     for split in ["train"]:
-        name = "lmo_pbr_{}_{}".format(obj, split)
+        name = "lmo_random_texture_all_pbr_{}_{}".format(obj, split)
         if split in ["train"]:
             filter_invalid = True
         else:

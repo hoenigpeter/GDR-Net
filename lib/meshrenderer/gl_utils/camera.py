@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-# flake8:noqa
+# -*- coding: UTF-8 -*-
 import logging as log
-from OpenGL import GL
+from OpenGL.GL import *
 import numpy as np
 
 
 class Camera(object):
-    def __init__(self, offset_u=0.0, offset_v=0.0):
+    def __init__(self):
         self.__T_world_view = np.eye(4, dtype=np.float32)
         self.__T_view_world = np.eye(4, dtype=np.float32)
 
@@ -19,9 +18,6 @@ class Camera(object):
         self.__relative_viewport = True
         self._w = 0
         self._h = 0
-
-        self.offset_u = offset_u
-        self.offset_v = offset_v
 
         self.dirty = False
 
@@ -36,7 +32,7 @@ class Camera(object):
         y = np.cross(z, x)
         rot = np.vstack((x, y, z))
         self.__T_view_world[:3, :3] = rot
-        self.__T_view_world[:3, 3] = -(np.dot(rot, pos))
+        self.__T_view_world[:3, 3] = -np.dot(rot, pos)
         self.__T_world_view[:3, :3] = rot.transpose()
         self.__T_world_view[:3, 3] = pos
         self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
@@ -71,26 +67,72 @@ class Camera(object):
         diff = near - far
         A = np.tan(fov / 2.0)
         self.__T_proj_view[:] = np.array(
-            [
-                [A / aspect, 0, 0, 0],
-                [0, A, 0, 0],
-                [0, 0, (far + near) / diff, 2 * far * near / diff],
-                [0, 0, -1, 0],
-            ],
+            [[A / aspect, 0, 0, 0], [0, A, 0, 0], [0, 0, (far + near) / diff, 2 * far * near / diff], [0, 0, -1, 0]],
             dtype=np.float32,
         )
         self.__T_view_proj[:] = np.linalg.inv(self.__T_proj_view)
         self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
         self.dirty = True
 
+    def ortho(self, left, right, bottom, top, nearVal, farVal):
+        self.__T_proj_view[:] = Camera.__glOrtho__(left, right, bottom, top, nearVal, farVal)
+        self.__T_view_proj[:] = np.linalg.inv(self.__T_proj_view)
+        self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
+        self.dirty = True
+
+    def realCameraIntrinsic(self, fx, fy, x0, y0, W, H, near, far):
+        I = np.array([[fx, 0.0, x0], [0.0, fy, y0], [0.0, 0, 1.0]])
+        self.setIntrinsic(I, W, H, near, far)
+
     def realCamera(self, W, H, K, R, t, near, far, scale=1.0, originIsInTopLeft=True):
         self.setIntrinsic(K, W, H, near, far, scale, originIsInTopLeft)
         self.__T_world_view[:3, :3] = R.transpose()
-        self.__T_world_view[:3, 3] = -(np.dot(R.transpose(), t.squeeze()))
+        self.__T_world_view[:3, 3] = -np.dot(R.transpose(), t.squeeze())
         z_flip = np.eye(4, dtype=np.float32)
         z_flip[2, 2] = -1
         self.__T_world_view[:] = self.__T_world_view.dot(z_flip)
         self.__T_view_world[:] = np.linalg.pinv(self.__T_world_view)
+        # self.__T_view_world[:3,:3] = self.__T_world_view[:3,:3].transpose()
+        # self.__T_view_world[:3,3] = -np.dot(self.__T_world_view[:3,:3], self.__T_view_world[:3,3].squeeze())
+        # self.__T_world_view
+
+        self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
+
+    def real_camera(self, W, H, K, R, t, near, far, scale=1.0, originIsInTopLeft=False, r=0.0, c=0.0):
+        self.setIntrinsic(K, W, H, near, far, scale, originIsInTopLeft)
+
+        Kinv = np.linalg.pinv(K)
+
+        p = np.array([r, c, 1], dtype=np.float64)
+        d = np.dot(Kinv, p)
+
+        eps = 1e-7
+
+        alpha = np.arctan(d[1] / (np.sqrt(d[2] ** 2 + d[0] ** 2) + eps))
+        beta = np.arctan(d[0] / (d[2] + eps))
+
+        Rx_alpha = np.array(
+            [[1, 0, 0, 0], [0, np.cos(alpha), -np.sin(alpha), 0], [0, np.sin(alpha), np.cos(alpha), 0], [0, 0, 0, 1]],
+            dtype=np.float32,
+        )
+
+        Ry_beta = np.array(
+            [[np.cos(beta), 0, np.sin(beta), 0], [0, 1, 0, 0], [-np.sin(beta), 0, np.cos(beta), 0], [0, 0, 0, 1]],
+            dtype=np.float32,
+        )
+
+        self.__T_view_world[:3, :3] = R
+        self.__T_view_world[:3, 3] = t.squeeze()
+
+        self.__T_world_view[:3, :3] = R.transpose()
+        self.__T_world_view[:3, 3] = -np.dot(R.transpose(), t.squeeze())
+
+        z_flip = np.eye(4, dtype=np.float32)
+        z_flip[2, 2] = -1
+        z_flip[1, 1] = -1
+
+        self.__T_world_view = z_flip.dot(self.__T_world_view)
+        self.__T_view_world = z_flip.dot(Ry_beta).dot(Rx_alpha).dot(self.__T_view_world)
 
         self.__T_proj_world[:] = np.dot(self.__T_proj_view, self.__T_view_world)
 
@@ -111,13 +153,10 @@ class Camera(object):
 
         A = near + far
         B = near * far
-        # NOTE: add 0.5 can lead to more accurate PnP/RANSAC result
-        u0 = I[0, 2] + self.offset_u  # 0.5
-        v0 = I[1, 2] + self.offset_v  # 0.5
         persp = np.array(
             [
-                [I[0, 0] * scale, I[0, 1] * scale, -u0 * scale, 0],
-                [0, I[1, 1] * scale, -v0 * scale, 0],
+                [I[0, 0] * scale, I[0, 1] * scale, -I[0, 2] * scale, 0],
+                [0, I[1, 1] * scale, -I[1, 2] * scale, 0],
                 [0, 0, A, B],
                 [0, 0, -1, 0],
             ],
@@ -179,12 +218,12 @@ class Camera(object):
     @property
     def data(self):
         return np.hstack(
-            (
-                self.T_view_world.T.reshape(-1),
-                self.T_proj_view.T.reshape(-1),
-                self.T_world_view[:3, 3].reshape(-1),
-            )
+            (self.T_view_world.T.reshape(-1), self.T_proj_view.T.reshape(-1), self.T_world_view[:3, 3].reshape(-1))
         ).astype(np.float32)
+
+    def set_window_dimensions(self, w, h):
+        self._w = w
+        self._h = h
 
     def set_viewport(self, x0, y0, w, h):
         self.__relative_viewport = all([v >= 0.0 and v <= 1.0 for v in [x0, y0, w, h]])

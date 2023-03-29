@@ -62,16 +62,7 @@ def _getlogger():
 
 
 _logger = _getlogger()
-_LOGGING_METHOD = [
-    "info",
-    "warning",
-    "error",
-    "critical",
-    "exception",
-    "debug",
-    "setLevel",
-    "addFilter",
-]
+_LOGGING_METHOD = ["info", "warning", "error", "critical", "exception", "debug", "setLevel", "addFilter"]
 
 
 # export logger functions

@@ -257,11 +257,13 @@ class GDRN_DatasetFromList(Base_DatasetFromList):
 
         data_ref = ref.__dict__[ref_key]
         objs = dset_meta.objs
+        print(objs)
         cfg = self.cfg
 
         cur_extents = {}
         for i, obj_name in enumerate(objs):
             obj_id = data_ref.obj2id[obj_name]
+            print(obj_id)
             model_path = osp.join(data_ref.model_dir, f"obj_{obj_id:06d}.ply")
             model = inout.load_ply(model_path, vertex_scale=data_ref.vertex_scale)
             pts = model["pts"]
@@ -740,6 +742,49 @@ def build_gdrn_test_loader(cfg, dataset_name, train_objs=None):
         )
         if cfg.DATALOADER.FILTER_EMPTY_DETS:
             dataset_dicts = filter_empty_dets(dataset_dicts)
+
+    dataset = GDRN_DatasetFromList(cfg, split="test", lst=dataset_dicts, flatten=False)
+
+    sampler = InferenceSampler(len(dataset))
+    # Always use 1 image per worker during inference since this is the
+    # standard when reporting inference time in papers.
+    batch_sampler = torch.utils.data.sampler.BatchSampler(sampler, 1, drop_last=False)
+
+    num_workers = cfg.DATALOADER.NUM_WORKERS
+    # Horovod: limit # of CPU threads to be used per worker.
+    # if num_workers > 0:
+    #     torch.set_num_threads(num_workers)
+
+    kwargs = {"num_workers": num_workers}
+    # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
+    # issues with Infiniband implementations that are not fork-safe
+    # https://github.com/horovod/horovod/blob/master/examples/pytorch/pytorch_imagenet_resnet50.py
+    # if (num_workers > 0 and hasattr(mp, '_supports_context') and
+    #         mp._supports_context and 'forkserver' in mp.get_all_start_methods()):
+    #     kwargs['multiprocessing_context'] = 'forkserver'
+    data_loader = torch.utils.data.DataLoader(
+        dataset, batch_sampler=batch_sampler, collate_fn=trivial_batch_collator, **kwargs
+    )
+    return data_loader
+
+def build_gdrn_test_loader_ros(cfg, dataset_name, train_objs=None):
+    """Similar to `build_detection_train_loader`. But this function uses the
+    given `dataset_name` argument (instead of the names in cfg), and uses batch
+    size 1.
+
+    Args:
+        cfg: a detectron2 CfgNode
+        dataset_name (str): a name of the dataset that's available in the DatasetCatalog
+
+    Returns:
+        DataLoader: a torch DataLoader, that loads the given detection
+        dataset, with test-time transformation and batching.
+    """
+    dataset_dicts = get_detection_dataset_dicts(
+        [dataset_name],
+        filter_empty=False,
+        proposal_files=None,
+    )
 
     dataset = GDRN_DatasetFromList(cfg, split="test", lst=dataset_dicts, flatten=False)
 

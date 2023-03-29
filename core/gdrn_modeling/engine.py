@@ -34,12 +34,13 @@ from core.utils.my_checkpoint import MyCheckpointer
 from core.utils.my_writer import MyCommonMetricPrinter, MyJSONWriter, MyPeriodicWriter, MyTensorboardXWriter
 from core.utils.utils import get_emb_show
 from core.utils.data_utils import denormalize_image
-from .data_loader import build_gdrn_train_loader, build_gdrn_test_loader
+from .data_loader import build_gdrn_train_loader, build_gdrn_test_loader, build_gdrn_test_loader_ros
 from .engine_utils import batch_data, get_out_coor, get_out_mask
 from .gdrn_evaluator import gdrn_inference_on_dataset, GDRN_Evaluator
 from .gdrn_custom_evaluator import GDRN_EvaluatorCustom
 import ref
 
+from GDRN_ROS import gdrn_inference_on_dataset_ros
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,11 @@ class GDRN_Lite(LightningLite):
         if len(results) == 1:
             results = list(results.values())[0]
         return results
+    
+    def do_ros(self, cfg, model, epoch=None, iteration=None):
+        results = OrderedDict()
+        results_i = gdrn_inference_on_dataset_ros(cfg, model)
+        print("thats it goodbye!")
 
     def do_train(self, cfg, args, model, optimizer, resume=False):
         model.train()

@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+
 """An awesome colormap for really neat visualizations.
 
 Copied from Detectron, and removed gray colors.
@@ -8,7 +9,7 @@ import numpy as np
 
 __all__ = ["colormap", "random_color"]
 
-# yapf: disable
+# fmt: off
 # RGB:
 _COLORS = np.array(
     [
@@ -88,7 +89,7 @@ _COLORS = np.array(
         1.000, 1.000, 1.000
     ]
 ).astype(np.float32).reshape(-1, 3)
-# yapf: enable
+# fmt: on
 
 
 def colormap(rgb=False, maximum=255):

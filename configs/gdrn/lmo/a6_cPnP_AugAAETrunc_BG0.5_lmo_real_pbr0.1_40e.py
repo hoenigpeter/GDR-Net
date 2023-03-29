@@ -79,4 +79,21 @@ MODEL = dict(
     ),
 )
 
+VAL = dict(
+    DATASET_NAME="lmo",
+    SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
+    TARGETS_FILENAME="test_targets_all.json",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="vsd,mspd,mssd,add",
+    RENDERER_TYPE="egl",  # cpp, python, egl
+    SPLIT="test",
+    SPLIT_TYPE="bb8",
+    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
+    EVAL_CACHED=False,  # if the predicted poses have been saved
+    SCORE_ONLY=False,  # if the errors have been calculated
+    EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
+    EVAL_PRECISION=False,  # use precision or recall
+    USE_BOP=True,  # whether to use bop toolkit
+)
+
 TEST = dict(EVAL_PERIOD=0, VIS=False, TEST_BBOX_TYPE="est")  # gt | est

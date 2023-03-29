@@ -31,6 +31,33 @@ from transforms3d.quaternions import quat2mat
 from .engine_utils import batch_data, get_out_coor, get_out_mask
 from .test_utils import _to_str, eval_cached_results, save_and_eval_results, to_list
 
+#-------------------------------------------------------------------------------------------------------------#
+import rospy
+from std_msgs.msg import Header
+from object_detector_msgs.msg import BoundingBox, Detection, Detections, PoseWithConfidence
+from object_detector_msgs.srv import detectron2_service_server, estimate_poses, estimate_posesResponse
+from geometry_msgs.msg import Pose, Point, Quaternion
+
+from mmcv import Config
+import rospy
+from std_msgs.msg import String, Float32MultiArray, Int64
+from sensor_msgs.msg import Image
+from sensor_msgs.msg import RegionOfInterest
+from vision_msgs.msg import Detection2DArray
+from vision_msgs.msg import Detection2D
+from vision_msgs.msg import BoundingBox2D
+from vision_msgs.msg import ObjectHypothesisWithPose
+from geometry_msgs.msg import Pose2D
+from cv_bridge import CvBridge, CvBridgeError
+
+from core.utils.data_utils import crop_resize_by_warp_affine, get_2d_coord_np, read_image_cv2, xyz_to_region
+from core.gdrn_modeling.data_loader import GDRN_DatasetFromList
+from detectron2.data import MetadataCatalog
+from detectron2.data import get_detection_dataset_dicts
+from lib.pysixd import inout, misc
+from pytorch_lightning.lite import LightningLite
+import json
+#-------------------------------------------------------------------------------------------------------------#
 
 class GDRN_Evaluator(DatasetEvaluator):
     """use bop toolkit to evaluate."""
@@ -512,7 +539,6 @@ class GDRN_Evaluator(DatasetEvaluator):
         results.append(result)
         return results
 
-
 def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False):
     """Run model on the data_loader and evaluate the metrics with evaluator.
     Also benchmark the inference speed of `model.forward` accurately. The model
@@ -564,6 +590,16 @@ def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False
                 obj_names = [evaluator.obj_names[_l] for _l in roi_labels]
                 if all(_obj not in evaluator.train_objs for _obj in obj_names):
                     continue
+
+            print("roi_img: ", batch["roi_img"].shape)
+            print("roi_classes: ", batch["roi_cls"].shape)
+            print("roi_cam: ", batch["roi_cam"].shape)
+            print("roi_whs: ", batch["roi_wh"].shape)
+            print("roi_centers: ", batch["roi_center"].shape)
+            print("resize_ratios: ", batch["resize_ratio"].shape)
+            print("roi_coord_2d: ", batch.get("roi_coord_2d", None).shape)
+            print("roi_extents: ", batch.get("roi_extent", None).shape)
+            print()
 
             with autocast(enabled=amp_test):
                 out_dict = model(
@@ -629,7 +665,6 @@ def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False
     if results is None:
         results = {}
     return results
-
 
 def save_result_of_dataset(cfg, model, data_loader, output_dir, dataset_name):
     """

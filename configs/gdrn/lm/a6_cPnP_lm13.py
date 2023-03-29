@@ -20,7 +20,8 @@ INPUT = dict(
 )
 
 SOLVER = dict(
-    IMS_PER_BATCH=24,
+    IMS_PER_BATCH=128,
+    TOTAL_EPOCHS=1,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -32,7 +33,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lm_13_train", "lm_imgn_13_train_1k_per_obj"),
+    TRAIN=("lm_pbr_13_train",),
     TEST=("lm_13_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )

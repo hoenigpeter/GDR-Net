@@ -6,13 +6,13 @@ import os.path as osp
 import mmcv
 from detectron2.data import DatasetCatalog, MetadataCatalog
 #from .datasets import ycbv_pbr, ycbv_d2, ycbv_bop_test
-from .datasets import lm_syn_imgn, lm_dataset_d2, lm_pbr, lm_blender, ycbv_pbr, ycbv_d2, ycbv_bop_test, lmo_random_texture_all_pbr
+from .datasets import lm_syn_imgn, lm_dataset_d2, lm_pbr, lm_blender, ycbv_pbr, ycbv_d2, ycbv_bop_test, lmo_random_texture_all_pbr, lmo_3r_pbr, lmo_5r_pbr, lmo_3r_1o_pbr, lmo_5r_1o_pbr
 
 cur_dir = osp.dirname(osp.abspath(__file__))
 # from lib.utils.utils import iprint
 __all__ = ["register_dataset", "register_datasets", "register_datasets_in_cfg", "get_available_datasets"]
 #_DSET_MOD_NAMES = ["ycbv_pbr", "ycbv_d2", "ycbv_bop_test"]
-_DSET_MOD_NAMES = ["lm_syn_imgn", "lm_dataset_d2", "lm_pbr", "lm_blender", "ycbv_pbr", "ycbv_d2", "ycbv_bop_test", "lmo_random_texture_all_pbr"]
+_DSET_MOD_NAMES = ["lm_syn_imgn", "lm_dataset_d2", "lm_pbr", "lm_blender", "ycbv_pbr", "ycbv_d2", "ycbv_bop_test", "lmo_random_texture_all_pbr", "lmo_3r_pbr", "lmo_5r_pbr", "lmo_3r_1o_pbr", "lmo_5r_1o_pbr"]
 
 logger = logging.getLogger(__name__)
 

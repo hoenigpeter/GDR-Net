@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-# flake8: noqa
 import numpy as np
+
 from OpenGL.GL import *
-from lib.meshrenderer.gl_utils.renderbuffer import (
-    Renderbuffer,
-    RenderbufferMultisample,
-)
+
+from .renderbuffer import Renderbuffer, RenderbufferMultisample
 from .texture import Texture, TextureMultisample
 
 
@@ -13,7 +11,7 @@ class Framebuffer(object):
     def __init__(self, attachements):
         self.__id = np.empty(1, dtype=np.uint32)
         glCreateFramebuffers(len(self.__id), self.__id)
-        for k in attachements.keys():
+        for k in list(attachements.keys()):
             attachement = attachements[k]
             if isinstance(attachement, Renderbuffer) or isinstance(attachement, RenderbufferMultisample):
                 glNamedFramebufferRenderbuffer(self.__id, k, GL_RENDERBUFFER, attachement.id)
@@ -31,7 +29,7 @@ class Framebuffer(object):
 
     def delete(self):
         glDeleteFramebuffers(1, self.__id)
-        for k in self.__attachements.keys():
+        for k in list(self.__attachements.keys()):
             self.__attachements[k].delete()
 
     @property

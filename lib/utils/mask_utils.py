@@ -8,9 +8,9 @@ from itertools import groupby
 import numpy as np
 import numpy.random as npr
 import pycocotools.mask as cocomask
-from PIL import Image
-from skimage.morphology import binary_dilation as _binary_dilation_sk
-from skimage.morphology import binary_erosion as _binary_erosion_sk
+from PIL import Image, ImageFile
+from skimage.morphology import binary_dilation as _binary_dilation
+from skimage.morphology import binary_erosion as _binary_erosion
 from skimage.morphology import disk
 import cv2
 
@@ -36,43 +36,6 @@ def get_edge(mask, bw=1, out_channel=3):
     return edges
 
 
-def mask_erode_cv2(mask, kernel_size=3, kernel_type="ellipse"):
-    mask = mask.astype("uint8")
-    assert kernel_type in ["ellipse", "square"], kernel_type
-    if kernel_type == "ellipse":
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
-    else:
-        kernel = np.ones((kernel_size, kernel_size), np.uint8)
-    mask_eroded = cv2.erode(mask, kernel)
-    return mask_eroded
-
-
-def get_contour_cv2(mask, kernel_size=3, kernel_type="ellipse", return_eroded=False):
-    interior = mask_erode_cv2(mask, kernel_size=kernel_size, kernel_type=kernel_type)
-    contour = mask * (1 - interior).astype(np.uint8)
-    if return_eroded:
-        return contour, interior
-    else:
-        return contour
-
-
-def mask_dilate_cv2(mask, kernel_size=3, kernel_type="ellipse"):
-    mask = mask.astype("uint8")
-    assert kernel_type in ["ellipse", "square"], kernel_type
-    if kernel_type == "ellipse":
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
-    else:
-        kernel = np.ones((kernel_size, kernel_size), np.uint8)
-    mask_dilated = cv2.dilate(mask, kernel)
-    return mask_dilated
-
-
-def read_mask_pil(mask_path, dtype=np.uint8):
-    mask = Image.open(mask_path)
-    mask_seg = np.array(mask).astype(dtype)
-    return mask_seg
-
-
 def mask2bbox_xyxy(mask):
     """NOTE: the bottom right point is included"""
     ys, xs = np.nonzero(mask)[:2]
@@ -85,16 +48,10 @@ def mask2bbox_xywh(mask):
     ys, xs = np.nonzero(mask)[:2]
     bb_tl = [xs.min(), ys.min()]
     bb_br = [xs.max(), ys.max()]
-    return [
-        bb_tl[0],
-        bb_tl[1],
-        bb_br[0] - bb_tl[0] + 1,
-        bb_br[1] - bb_tl[1] + 1,
-    ]
+    return [bb_tl[0], bb_tl[1], bb_br[0] - bb_tl[0] + 1, bb_br[1] - bb_tl[1] + 1]
 
 
 def binary_mask_to_rle(mask, compressed=True):
-    assert mask.ndim == 2, mask.shape
     mask = mask.astype(np.uint8)
     if compressed:
         rle = cocomask.encode(np.asfortranarray(mask))
@@ -163,14 +120,12 @@ def segmToRLE(segm, h, w):
 
 
 def cocosegm2mask(segm, h, w):
-    if isinstance(segm, np.ndarray):
-        return segm
     rle = segmToRLE(segm, h, w)
     mask = rle2mask(rle, h, w)
     return mask
 
 
-def mask_expand(mask_origin, thickness=10):
+def mask_dilate(mask_origin, thickness=10):
     """from DeepIM.
 
     :param mask_origin: mask to be dilated
@@ -181,16 +136,15 @@ def mask_expand(mask_origin, thickness=10):
     h, w = mask_origin.shape
     for up_down in [0, thickness]:
         for left_right in [0, thickness]:
-            mask_expand[up_down : (h - thickness + up_down), left_right : (w - thickness + left_right),] += mask_origin[
-                thickness - up_down : (h - up_down),
-                thickness - left_right : (w - left_right),
+            mask_expand[up_down : (h - thickness + up_down), left_right : (w - thickness + left_right)] += mask_origin[
+                thickness - up_down : (h - up_down), thickness - left_right : (w - left_right)
             ]
 
     mask_expand[mask_expand >= 1] = 1
     return mask_expand
 
 
-def random_mask_expand(mask_origin, max_thickness=10):
+def random_mask_dilate(mask_origin, max_thickness=10):
     """from DeepIM.
 
     :param pairdb:
@@ -206,16 +160,15 @@ def random_mask_expand(mask_origin, max_thickness=10):
         for lr in [0, 1]:
             up_down = ud * thickness
             left_right = lr * thickness
-            mask_expand[up_down : (h - thickness + up_down), left_right : (w - thickness + left_right),] += mask_origin[
-                (thickness - up_down) : (h - up_down),
-                (thickness - left_right) : (w - left_right),
+            mask_expand[up_down : (h - thickness + up_down), left_right : (w - thickness + left_right)] += mask_origin[
+                (thickness - up_down) : (h - up_down), (thickness - left_right) : (w - left_right)
             ]
 
     mask_expand[mask_expand >= 1] = 1
     return mask_expand
 
 
-def binary_dilation_sk(x, radius=3):
+def binary_dilation(x, radius=3):
     """Return fast binary morphological dilation of an image.
 
     # https://github.com/zsdonghao/tensorlayer2/blob/master/tensorlayer/prepro.py
@@ -233,17 +186,17 @@ def binary_dilation_sk(x, radius=3):
         A processed binary image.
     """
     mask = disk(radius)
-    x = _binary_dilation_sk(x, selem=mask)
+    x = _binary_dilation(x, selem=mask)
 
     return x
 
 
-def random_binary_dilation_sk(x, radious=3):
+def random_binary_dilation(x, radious=3):
     r = np.random.randint(radious)
-    return binary_dilation_sk(x, r)
+    return binary_dilation(x, r)
 
 
-def binary_erosion_sk(x, radius=3):
+def binary_erosion(x, radius=3):
     """Return binary morphological erosion of an image, see
     `skimage.morphology.binary_erosion.
 
@@ -260,24 +213,13 @@ def binary_erosion_sk(x, radius=3):
         A processed binary image.
     """
     mask = disk(radius)
-    x = _binary_erosion_sk(x, selem=mask)
+    x = _binary_erosion(x, selem=mask)
     return x
 
 
-def random_binary_erosion_sk(x, radious=3):
+def random_binary_erosion(x, radious=3):
     r = npr.randint(radious)
-    return binary_erosion_sk(x, r)
-
-
-def batch_dice_score(x, target, eps=1e-5):
-    # NOTE: the first dim is batch dim
-    n_inst = x.shape[0]
-    x = x.reshape(n_inst, -1)
-    target = target.reshape(n_inst, -1)
-    intersection = (x * target).sum(axis=1)
-    union = (x**2.0).sum(axis=1) + (target**2.0).sum(axis=1) + eps
-    dice_ = 2 * intersection / union
-    return dice_
+    return binary_erosion(x, r)
 
 
 if __name__ == "__main__":
@@ -331,9 +273,5 @@ if __name__ == "__main__":
     c_2 = a * 127 + b_binary_erosion * 128
 
     show_ims = [c, c_1, c_2]
-    show_titles = [
-        "random_dilate",
-        "random_binary_dilation",
-        "random_binary_erosion",
-    ]
+    show_titles = ["random_dilate", "random_binary_dilation", "random_binary_erosion"]
     grid_show(show_ims, show_titles, row=1, col=3)
