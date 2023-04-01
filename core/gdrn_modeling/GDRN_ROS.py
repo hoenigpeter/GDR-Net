@@ -69,16 +69,16 @@ class GDRN_ROS:
 
         im_H, im_W = image_shape = image.shape[:2]
         coord_2d = get_2d_coord_np(im_W, im_H, low=0, high=1).transpose(1, 2, 0)
-        x1, y1, x2, y2 = detection.bbox.ymin, detection.bbox.xmin, detection.bbox.ymax, detection.bbox.xmax
+        x1, y1, x2, y2 = detection.bbox.xmin, detection.bbox.ymin, detection.bbox.xmax, detection.bbox.ymax
         bbox_center = np.array([0.5 * (x1 + x2), 0.5 * (y1 + y2)])
         bw = max(x2 - x1, 1)
         bh = max(y2 - y1, 1)
+        #scale = max(bh, bw) * self.cfg.INPUT.DZI_PAD_SCALE
         scale = max(bh, bw) * self.cfg.INPUT.DZI_PAD_SCALE
         scale = min(scale, max(im_H, im_W)) * 1.0
-
+        print(scale)
         input_res = self.cfg.MODEL.CDPN.BACKBONE.INPUT_RES
         out_res = self.cfg.MODEL.CDPN.BACKBONE.OUTPUT_RES
-
         roi_img = crop_resize_by_warp_affine(
             image, bbox_center, scale, input_res, interpolation=cv2.INTER_LINEAR
         ).transpose(2, 0, 1)      
@@ -90,13 +90,15 @@ class GDRN_ROS:
             ).transpose(
                 2, 0, 1
             )  # HWC -> CHW
-        roi_extents = np.array([[self.extents[str(roi_classes[0])]['size_x'], self.extents[str(roi_classes[0])]['size_y'], self.extents[str(roi_classes[0])]['size_z']]]).astype("float32")
+        roi_extents = np.array([[self.extents[str(roi_classes[0]+1)]['size_x'], self.extents[str(roi_classes[0]+1)]['size_y'], self.extents[str(roi_classes[0]+1)]['size_z']]]).astype("float32")
+        print(roi_extents)
         roi_wh = np.array([[bw, bh]], dtype=np.float32)
         print(int(detection.name))
 
         #YCBV Cam: [1066.778, 0.0, 312.9869079589844, 0.0, 1067.487, 241.3108977675438, 0.0, 0.0, 1.0]
         #Intel RealSense D435 from /camera/color/camera_info    [606.6173706054688, 0.0, 322.375, 0.0, 605.2778930664062, 232.67811584472656, 0.0, 0.0, 1.0]
         roi_cam = np.array([[[606.6173706054688, 0.0, 322.375], [0.0, 605.2778930664062, 232.67811584472656], [0.0, 0.0, 1.0]]]).astype("float32")
+        #roi_cam = np.array([[[1066.778, 0.0, 312.9869079589844], [0.0, 1067.487, 241.3108977675438], [0.0, 0.0, 1.0]]]).astype("float32")
 
         roi_center = np.array([bbox_center]).astype("float32")
         resize_ratio = np.array( [out_res / scale] ).astype("float32")
@@ -117,15 +119,14 @@ class GDRN_ROS:
         roi_extents = torch.tensor(roi_extents).to(device, non_blocking=True)
 
         #roi_classes no tensor
-
-        print("roi_img: ", roi_img.shape)
-        print("roi_classes: ", roi_classes.shape)
-        print("roi_cam: ", roi_cams.shape)
-        print("roi_wh: ", roi_whs.shape)
-        print("roi_center: ", roi_centers.shape)
-        print("resize_ratios: ", resize_ratios.shape)
-        print("roi_coord_2d: ", roi_coord_2d.shape)
-        print("roi_extents: ", roi_extents.shape)
+        # print("roi_img: ", roi_img.shape)
+        # print("roi_classes: ", roi_classes.shape)
+        # print("roi_cam: ", roi_cams.shape)
+        # print("roi_wh: ", roi_whs.shape)
+        # print("roi_center: ", roi_centers.shape)
+        # print("resize_ratios: ", resize_ratios.shape)
+        # print("roi_coord_2d: ", roi_coord_2d.shape)
+        # print("roi_extents: ", roi_extents.shape)
 
         
         with inference_context(self.model), torch.no_grad():
@@ -142,15 +143,12 @@ class GDRN_ROS:
 
         print(out_dict['rot'].cpu().numpy())
         print(out_dict['trans'].cpu().numpy())
-        print(out_dict['trans'][0][0].cpu().numpy())
-        print(out_dict['trans'][0][1].cpu().numpy())
-        print(out_dict['trans'][0][2].cpu().numpy())
 
         R_0 = np.eye(4,4)
         R_0[ 0:3,0:3 ] = out_dict['rot'][0].cpu().numpy()
 
         br = tf.TransformBroadcaster()
-        br.sendTransform((out_dict['trans'][0].cpu().numpy()),
+        br.sendTransform((out_dict['trans'][0][0].cpu().numpy() / 2, out_dict['trans'][0][1].cpu().numpy() / 2, out_dict['trans'][0][2].cpu().numpy() / 2),
                      #tf.transformations.quaternion_from_euler(0, 0, 0),
                      tf.transformations.quaternion_from_matrix(R_0),
                      rospy.Time.now(),

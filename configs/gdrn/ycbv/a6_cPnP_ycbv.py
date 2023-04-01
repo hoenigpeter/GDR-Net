@@ -1,7 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-#OUTPUT_DIR = "output/gdrn/lmoSO/a6_cPnP_AugAAETrunc_BG0.5_lmoRealBl_160e_SO/ape"
-OUTPUT_DIR = "output/gdrn/lmoSO/ape"
+OUTPUT_DIR = "output/gdrn/ycbv/a6_cPnP_AugAAETrunc_BG0.5_Rsym_ycbv_real_pbr_visib20_10e"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -27,8 +26,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    #TOTAL_EPOCHS=160,
-    TOTAL_EPOCHS=160,
+    TOTAL_EPOCHS=10,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -37,17 +35,29 @@ SOLVER = dict(
     WEIGHT_DECAY=0.0,
     WARMUP_FACTOR=0.001,
     WARMUP_ITERS=1000,
-    AMP=dict(ENABLED=True),
+    CHECKPOINT_PERIOD=1,
 )
 
 DATASETS = dict(
-    TRAIN=("lm_pbr_ape_train",),
-    TEST=("lmo_test",),
-    # AP	AP50	AR	inf.time
-    # 60.657	89.625	66.2	0.024449
+    #TRAIN=("ycbv_train_real", "ycbv_train_pbr"),
+    TEST=("ycbv_test",),
+    # # AP    AP50  AR    inf.time  (faster RCNN)
+    # # 75.10 93.00 81.40 25.4ms
+    # DET_FILES_TEST=(
+    #     "datasets/BOP_DATASETS/ycbv/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_ycbv_real_pbr_8e_test_keyframe_480x640.json",
+    # ),
+    # AP     AP50   AR   inf.time  (fcos_V57)
+    # 79.581 96.949 84.2 56.572ms
     DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
+        "datasets/BOP_DATASETS/ycbv/test/test_bboxes/fcos_V57eSE_MSx1333_ColorAugAAEWeaker_8e_ycbv_real_pbr_8e_test_keyframe.json",
     ),
+    SYM_OBJS=["024_bowl", "036_wood_block", "051_large_clamp", "052_extra_large_clamp", "061_foam_brick"],  # ycbv
+)
+
+DATALOADER = dict(
+    # Number of data loading threads
+    NUM_WORKERS=4,
+    FILTER_VISIB_THR=0.2,
 )
 
 MODEL = dict(
@@ -57,6 +67,7 @@ MODEL = dict(
     CDPN=dict(
         ROT_HEAD=dict(
             FREEZE=False,
+            NUM_CLASSES=21,  # not used for class-agnostic
             ROT_CLASS_AWARE=False,
             MASK_CLASS_AWARE=False,
             XYZ_LW=1.0,
@@ -71,6 +82,7 @@ MODEL = dict(
             TRANS_TYPE="centroid_z",
             PM_NORM_BY_EXTENT=True,
             PM_R_ONLY=True,
+            PM_LOSS_SYM=True,
             CENTROID_LOSS_TYPE="L1",
             CENTROID_LW=1.0,
             Z_LOSS_TYPE="L1",
@@ -80,21 +92,13 @@ MODEL = dict(
     ),
 )
 
-""" VAL = dict(
-    DATASET_NAME="lmo",
+VAL = dict(
+    DATASET_NAME="ycbvposecnn",
+    SPLIT_TYPE="",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    TARGETS_FILENAME="test_targets_all.json",
-    #ERROR_TYPES="ad,rete,re,te,proj",
-    ERROR_TYPES="add,mspd,mssd",
-    RENDERER_TYPE="egl",  # cpp, python, egl
-    SPLIT="test",
-    SPLIT_TYPE="bb8",
-    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
-    EVAL_CACHED=False,  # if the predicted poses have been saved
-    SCORE_ONLY=False,  # if the errors have been calculated
-    EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
-    EVAL_PRECISION=False,  # use precision or recall
+    TARGETS_FILENAME="ycbv_test_targets_keyframe.json",
+    ERROR_TYPES="AUCadd,AUCadi,AUCad,ad,ABSadd,ABSadi,ABSad",
     USE_BOP=True,  # whether to use bop toolkit
-) """
+)
 
-TEST = dict(EVAL_PERIOD=0, VIS=True, TEST_BBOX_TYPE="est")  # gt | est
+TEST = dict(EVAL_PERIOD=0, VIS=False, TEST_BBOX_TYPE="est")  # gt | est

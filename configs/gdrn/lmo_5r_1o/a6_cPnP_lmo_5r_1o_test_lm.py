@@ -1,7 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-#OUTPUT_DIR = "output/gdrn/lmoSO/a6_cPnP_AugAAETrunc_BG0.5_lmoRealBl_160e_SO/ape"
-OUTPUT_DIR = "output/gdrn/lmo_random_texture_all/cat"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_test/lmo_5r_1o"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -27,8 +26,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    #TOTAL_EPOCHS=160,
-    TOTAL_EPOCHS=160,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -37,16 +35,16 @@ SOLVER = dict(
     WEIGHT_DECAY=0.0,
     WARMUP_FACTOR=0.001,
     WARMUP_ITERS=1000,
-    AMP=dict(ENABLED=True),
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_random_texture_all_pbr_cat_train",),
-    TEST=("lmo_test",),
+    TRAIN=("lmo_5r_1o_pbr_train",),
+    TEST=("lm_lmo_13_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
+        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
+        "datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",
     ),
 )
 
@@ -81,11 +79,11 @@ MODEL = dict(
 )
 
 VAL = dict(
-    DATASET_NAME="lmo",
+    DATASET_NAME="lm",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    TARGETS_FILENAME="test_targets_all.json",
-    #ERROR_TYPES="ad,rete,re,te,proj",
-    ERROR_TYPES="add,mspd,mssd",
+    TARGETS_FILENAME="lm_test_targets_bb8.json",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="add,mspd,mssd,vsd",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="bb8",

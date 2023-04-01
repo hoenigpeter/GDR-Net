@@ -361,6 +361,36 @@ SPLITS_LM = dict(
         filter_invalid=False,
         ref_key="lm_full",
     ),
+    lm_lmo_13_test=dict(
+        name="lm_lmo_13_test",
+        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/"),
+        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/models"),
+        objs=LM_OCC_OBJECTS,
+        ann_files=[
+            osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/image_set/{}_{}.txt".format(_obj, "test"))
+            for _obj in LM_OCC_OBJECTS
+        ],
+        # NOTE: scene root
+        image_prefixes=[
+            osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/test/{:06d}").format(ref.lm_full.obj2id[_obj])
+            for _obj in LM_OCC_OBJECTS
+        ],
+        xyz_prefixes=[
+            osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/test/xyz_crop/{:06d}".format(ref.lm_full.obj2id[_obj]))
+            for _obj in LM_OCC_OBJECTS
+        ],
+        scale_to_meter=0.001,
+        with_masks=True,  # (load masks but may not use it)
+        with_depth=True,  # (load depth path here, but may not use it)
+        height=480,
+        width=640,
+        cache_dir=osp.join(PROJ_ROOT, ".cache"),
+        use_cache=True,
+        num_to_load=-1,
+        filter_scene=True,
+        filter_invalid=False,
+        ref_key="lm_full",
+    ),
     lmo_train=dict(
         name="lmo_train",
         # use lm real all (8 objects) to train for lmo
