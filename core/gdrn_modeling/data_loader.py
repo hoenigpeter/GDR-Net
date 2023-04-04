@@ -257,13 +257,11 @@ class GDRN_DatasetFromList(Base_DatasetFromList):
 
         data_ref = ref.__dict__[ref_key]
         objs = dset_meta.objs
-        print(objs)
         cfg = self.cfg
 
         cur_extents = {}
         for i, obj_name in enumerate(objs):
             obj_id = data_ref.obj2id[obj_name]
-            print(obj_id)
             model_path = osp.join(data_ref.model_dir, f"obj_{obj_id:06d}.ply")
             model = inout.load_ply(model_path, vertex_scale=data_ref.vertex_scale)
             pts = model["pts"]

@@ -592,12 +592,12 @@ def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False
                     continue
 
             # print("roi_img: ", batch["roi_img"].shape)
-            print("roi_classes: ", batch["roi_cls"].shape)
-            print("roi_cam: ", batch["roi_cam"].shape)
-            print("roi_whs: ", batch["roi_wh"].shape)
-            print("roi_centers: ", batch["roi_center"].shape)
-            print("resize_ratios: ", batch["resize_ratio"].shape)
-            print("roi_coord_2d: ", batch.get("roi_coord_2d", None).shape)
+            # print("roi_classes: ", batch["roi_cls"].shape)
+            # print("roi_cam: ", batch["roi_cam"].shape)
+            # print("roi_whs: ", batch["roi_wh"].shape)
+            # print("roi_centers: ", batch["roi_center"].shape)
+            # print("resize_ratios: ", batch["resize_ratio"].shape)
+            # print("roi_coord_2d: ", batch.get("roi_coord_2d", None).shape)
             # print("roi_extents: ", batch.get("roi_extent", None).shape)
             # print()
 
