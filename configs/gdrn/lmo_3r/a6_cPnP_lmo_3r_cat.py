@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_5r_SO/ape"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_3r_SO/cat"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_5r_pbr_ape_train",),
+    TRAIN=("lmo_3r_pbr_cat_train",),
     TEST=("lmo_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
