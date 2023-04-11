@@ -328,6 +328,23 @@ SPLITS_LM_PBR = dict(
         filter_invalid=True,
         ref_key="lmo_random_texture_all_full",
     ),
+    lm_random_texture_all_pbr_13_train=dict(
+        name="lm_random_texture_all_pbr_13_train",
+        objs=LM_13_OBJECTS,  # selected objects
+        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_random_texture_all/train_pbr"),
+        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/models"),
+        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_random_texture_all/train_pbr/xyz_crop"),
+        scale_to_meter=0.001,
+        with_masks=True,  # (load masks but may not use it)
+        with_depth=True,  # (load depth path here, but may not use it)
+        height=480,
+        width=640,
+        cache_dir=osp.join(PROJ_ROOT, ".cache"),
+        use_cache=True,
+        num_to_load=-1,
+        filter_invalid=True,
+        ref_key="lm_random_texture_all_full",
+    ),
 )
 
 """ # single obj splits

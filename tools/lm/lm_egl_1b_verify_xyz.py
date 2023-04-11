@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 
 cur_dir = osp.abspath(osp.dirname(__file__))
-PROJ_ROOT = osp.join(cur_dir, "../../../..")
+PROJ_ROOT = osp.join(cur_dir, "../..")
 sys.path.insert(0, PROJ_ROOT)
 from core.utils.data_utils import get_2d_coord_np
 from lib.pysixd import inout, misc
@@ -61,8 +61,8 @@ model_paths = [osp.join(lm_model_dir, f"obj_{cls_idx:06d}.ply") for cls_idx in c
 texture_paths = None
 
 xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
-gt_path = osp.join(data_dir, "gt.json")
-assert osp.exists(gt_path)
+# gt_path = osp.join(data_dir, "scene_gt.json")
+# assert osp.exists(gt_path)
 
 K = np.array([[572.4114, 0, 325.2611], [0, 573.57043, 242.04899], [0, 0, 1]])
 DEPTH_FACTOR = 10000.0
@@ -141,7 +141,7 @@ class XyzVerify(object):
     def main(self, scene):
         gt_path = osp.join(data_dir, str(scene))
         gt_path = osp.join(gt_path, "scene_gt.json")
-        mmcv.mkdir_or_exist(osp.dirname(gt_path))
+        #mmcv.mkdir_or_exist(osp.dirname(gt_path))
         print(gt_path)
         assert osp.exists(gt_path)
 
@@ -154,7 +154,9 @@ class XyzVerify(object):
 
             for anno_i, anno in enumerate(annos):
                 obj_id = anno["obj_id"]
-                pose = np.array(anno["pose"])
+                R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
+                t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
+                pose = np.hstack([R, t.reshape(3, 1)])
 
                 mask = cocosegm2mask(anno["mask_full"], IM_H, IM_W)
                 area = mask.sum()

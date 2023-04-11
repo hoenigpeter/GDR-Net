@@ -1,1 +1,1 @@
-from . import tless, lm_full, lmo_full, ycbv, lmo_random_texture_all_full, lmo_3r_full, lmo_5r_full, lmo_3r_1o_full, lmo_5r_1o_full
+from . import tless, lm_full, lmo_full, ycbv, lmo_random_texture_all_full, lm_random_texture_all_full,lmo_3r_full, lm_3r_full, lmo_5r_full, lm_5r_full, lmo_7r_full, lm_7r_full, lmo_3r_1o_full, lmo_5r_1o_full

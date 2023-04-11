@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/1_epoch/lmo_5r"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_5r"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -26,7 +26,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=1,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -81,11 +81,10 @@ VAL = dict(
     DATASET_NAME="lmo",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_all.json",
-    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="add,mspd,mssd",
+    ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
-    SPLIT_TYPE="bb8",
+    SPLIT_TYPE="",
     N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
     EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated

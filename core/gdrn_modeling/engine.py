@@ -40,8 +40,6 @@ from .gdrn_evaluator import gdrn_inference_on_dataset, GDRN_Evaluator
 from .gdrn_custom_evaluator import GDRN_EvaluatorCustom
 import ref
 
-from GDRN_ROS import gdrn_inference_on_dataset_ros
-
 logger = logging.getLogger(__name__)
 
 
@@ -143,6 +141,7 @@ class GDRN_Lite(LightningLite):
         return results
     
     def do_ros(self, cfg, model, epoch=None, iteration=None):
+        from GDRN_ROS import gdrn_inference_on_dataset_ros
         results = OrderedDict()
         results_i = gdrn_inference_on_dataset_ros(cfg, model)
         print("thats it goodbye!")

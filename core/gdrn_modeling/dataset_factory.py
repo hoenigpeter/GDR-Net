@@ -20,6 +20,7 @@ from .datasets import (
     lmo_random_texture_all_pbr,
     lmo_3r_pbr,
     lmo_5r_pbr,
+    lmo_7r_pbr,
     lmo_3r_1o_pbr,
     lmo_5r_1o_pbr
 )
@@ -42,6 +43,7 @@ _DSET_MOD_NAMES = [
     "lmo_random_texture_all_pbr",
     "lmo_3r_pbr",
     "lmo_5r_pbr",
+    "lmo_7r_pbr",
     "lmo_3r_1o_pbr",
     "lmo_5r_1o_pbr"
 ]
