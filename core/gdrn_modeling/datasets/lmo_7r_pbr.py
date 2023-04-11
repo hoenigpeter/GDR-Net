@@ -403,6 +403,32 @@ for obj in ref.lmo_full.objects:
                 ref_key="lmo_7r_full",
             )
 
+# lmo single objs
+for obj in ref.lm_full.objects:
+    for split in ["train"]:
+        name = "lm_7r_pbr_{}_{}".format(obj, split)
+        if split in ["train"]:
+            filter_invalid = True
+        else:
+            raise ValueError("{}".format(split))
+        if name not in SPLITS_LM_PBR:
+            SPLITS_LM_PBR[name] = dict(
+                name=name,
+                objs=[obj],  # only this obj
+                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_7r/train_pbr"),
+                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_7r/models"),
+                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_7r/train_pbr/xyz_crop"),
+                scale_to_meter=0.001,
+                with_masks=True,  # (load masks but may not use it)
+                with_depth=True,  # (load depth path here, but may not use it)
+                height=480,
+                width=640,
+                cache_dir=osp.join(PROJ_ROOT, ".cache"),
+                use_cache=True,
+                num_to_load=-1,
+                filter_invalid=filter_invalid,
+                ref_key="lm_7r_full",
+            )
 
 def register_with_name_cfg(name, data_cfg=None):
     """Assume pre-defined datasets live in `./datasets`.
