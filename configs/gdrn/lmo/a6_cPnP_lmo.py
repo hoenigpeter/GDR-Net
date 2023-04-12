@@ -44,6 +44,7 @@ DATASETS = dict(
     # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
         "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
+        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",
     ),
 )
 
@@ -80,7 +81,8 @@ MODEL = dict(
 VAL = dict(
     DATASET_NAME="lmo",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    TARGETS_FILENAME="test_targets_all.json",
+    #TARGETS_FILENAME="test_targets_all.json",
+    TARGETS_FILENAME="test_targets_bop19.json",
     ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",

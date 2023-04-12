@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_5r_SO/ape"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_7r_SO/ape"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_5r_pbr_ape_train",),
+    TRAIN=("lmo_7r_pbr_ape_train",),
     TEST=("lmo_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
@@ -81,7 +81,8 @@ VAL = dict(
     DATASET_NAME="lmo",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_all.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
