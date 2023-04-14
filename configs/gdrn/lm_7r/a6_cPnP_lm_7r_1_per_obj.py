@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_7r_SO/_all"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,14 +38,9 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_pbr_train",),
-    TEST=("lmo_test",),
-    # AP	AP50	AR	inf.time
-    # 60.657	89.625	66.2	0.024449
-    DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",
-    ),
+    TRAIN=("lm_7r_pbr_13_train",),
+    TEST=("lm_13_test",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
 
 MODEL = dict(
@@ -77,19 +72,17 @@ MODEL = dict(
         TRANS_HEAD=dict(ENABLED=False),
     ),
 )
-
 VAL = dict(
-    DATASET_NAME="lmo",
+    DATASET_NAME="lm",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    #TARGETS_FILENAME="test_targets_all.json",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
     N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
-    EVAL_CACHED=False,  # if the predicted poses have been saved
+    EVAL_CACHED=True,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall
