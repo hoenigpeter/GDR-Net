@@ -80,7 +80,7 @@ class XyzGen(object):
             self.pc_cam_tensor = torch.cuda.FloatTensor(height, width, 4, device=device).detach()
         return self.renderer
 
-    def main(self):
+    def main(self, objs_list):
         for scene in tqdm(scenes):
             scene_id = int(scene)
             scene_root = osp.join(data_dir, scene)
@@ -95,7 +95,7 @@ class XyzGen(object):
 
                 for anno_i, anno in enumerate(annos):
                     obj_id = anno["obj_id"]
-                    if obj_id in objs:
+                    if obj_id in objs_list:
                         # read Pose and K
                         R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
                         t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
@@ -209,6 +209,8 @@ if __name__ == "__main__":
 
     VIS = args.vis
 
+    objs_list = objs
+
     device = torch.device(int(args.gpu))
     dtype = torch.float32
     tensor_kwargs = {"device": device, "dtype": dtype}
@@ -216,6 +218,6 @@ if __name__ == "__main__":
     T_begin = time.perf_counter()
     setproctitle.setproctitle("gen_xyz_tless_egl")
     xyz_gen = XyzGen()
-    xyz_gen.main()
+    xyz_gen.main(objs_list)
     T_end = time.perf_counter() - T_begin
     print("total time: ", T_end)
