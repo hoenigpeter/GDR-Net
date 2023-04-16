@@ -42,8 +42,6 @@ xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
 
 scenes = [f"{i:06d}" for i in range(50)]
 
-#objs_list = [4,5,6,7]
-
 def normalize_to_01(img):
     if img.max() != img.min():
         return (img - img.min()) / (img.max() - img.min())
@@ -201,15 +199,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="gen tless random texture pbr xyz")
     parser.add_argument("--gpu", type=str, default="0", help="gpu")
     parser.add_argument("--vis", default=False, action="store_true", help="vis")
-    parser.add_argument("--objs", type=list, default=[0])
+    parser.add_argument('--objs', help='delimited list input', type=str)
     args = parser.parse_args()
+
+    objs_list = [int(item) for item in args.objs.split(',')]
 
     height = IM_H
     width = IM_W
 
     VIS = args.vis
-
-    objs_list = args.objs
 
     device = torch.device(int(args.gpu))
     dtype = torch.float32

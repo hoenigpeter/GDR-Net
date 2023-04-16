@@ -42,8 +42,6 @@ xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
 
 scenes = [f"{i:06d}" for i in range(50)]
 
-objs_list = [27, 28, 29, 30]
-
 def normalize_to_01(img):
     if img.max() != img.min():
         return (img - img.min()) / (img.max() - img.min())
@@ -80,7 +78,7 @@ class XyzGen(object):
             self.pc_cam_tensor = torch.cuda.FloatTensor(height, width, 4, device=device).detach()
         return self.renderer
 
-    def main(self):
+    def main(self, objs_list):
         for scene in tqdm(scenes):
             scene_id = int(scene)
             scene_root = osp.join(data_dir, scene)
@@ -201,7 +199,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="gen tless pbr xyz")
     parser.add_argument("--gpu", type=str, default="0", help="gpu")
     parser.add_argument("--vis", default=False, action="store_true", help="vis")
+    parser.add_argument('--objs', help='delimited list input', type=str)
     args = parser.parse_args()
+
+    objs_list = [int(item) for item in args.objs.split(',')]
 
     height = IM_H
     width = IM_W
@@ -215,6 +216,6 @@ if __name__ == "__main__":
     T_begin = time.perf_counter()
     setproctitle.setproctitle("gen_xyz_tless_egl")
     xyz_gen = XyzGen()
-    xyz_gen.main()
+    xyz_gen.main(objs_list)
     T_end = time.perf_counter() - T_begin
     print("total time: ", T_end)
