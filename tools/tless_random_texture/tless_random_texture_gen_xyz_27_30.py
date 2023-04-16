@@ -95,7 +95,7 @@ class XyzGen(object):
 
                 for anno_i, anno in enumerate(annos):
                     obj_id = anno["obj_id"]
-                    if obj_id == 8:
+                    if obj_id in objs_list:
                         # read Pose and K
                         R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
                         t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
