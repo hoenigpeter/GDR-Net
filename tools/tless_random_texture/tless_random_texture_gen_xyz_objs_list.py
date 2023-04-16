@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
     VIS = args.vis
 
-    objs_list = objs
+    objs_list = args.objs
 
     device = torch.device(int(args.gpu))
     dtype = torch.float32
