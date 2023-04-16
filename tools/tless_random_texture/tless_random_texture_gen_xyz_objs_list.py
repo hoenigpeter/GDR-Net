@@ -42,7 +42,7 @@ xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
 
 scenes = [f"{i:06d}" for i in range(50)]
 
-objs_list = [4,5,6,7]
+#objs_list = [4,5,6,7]
 
 def normalize_to_01(img):
     if img.max() != img.min():
@@ -95,7 +95,7 @@ class XyzGen(object):
 
                 for anno_i, anno in enumerate(annos):
                     obj_id = anno["obj_id"]
-                    if obj_id in objs_list:
+                    if obj_id in objs:
                         # read Pose and K
                         R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
                         t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
@@ -201,6 +201,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="gen tless random texture pbr xyz")
     parser.add_argument("--gpu", type=str, default="0", help="gpu")
     parser.add_argument("--vis", default=False, action="store_true", help="vis")
+    parser.add_argument("--objs", type=list, default=[0])
     args = parser.parse_args()
 
     height = IM_H
