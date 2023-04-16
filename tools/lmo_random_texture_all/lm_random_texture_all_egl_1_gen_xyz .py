@@ -53,7 +53,7 @@ print(scenes)
 
 cls_indexes = [_idx for _idx in sorted(idx2class.keys())]
 cls_names = [idx2class[cls_idx] for cls_idx in cls_indexes]
-lmo_model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/lm/models"))
+lmo_model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/lm_random_texture_all/models"))
 model_paths = [osp.join(lmo_model_dir, f"obj_{cls_idx:06d}.ply") for cls_idx in cls_indexes]
 texture_paths = None
 
