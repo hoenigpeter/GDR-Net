@@ -19,22 +19,21 @@ from lib.utils.mask_utils import cocosegm2mask
 
 idx2class = {
     1: "ape",
-    2: "benchvise",
-    3: "bowl",
-    4: "camera",
+    #  2: 'benchvise',
+    #  3: 'bowl',
+    #  4: 'camera',
     5: "can",
     6: "cat",
-    7: "cup",
+    #  7: 'cup',
     8: "driller",
     9: "duck",
     10: "eggbox",
     11: "glue",
     12: "holepuncher",
-    13: "iron",
-    14: "lamp",
-    15: "phone",
+    #  13: 'iron',
+    #  14: 'lamp',
+    #  15: 'phone'
 }
-
 class2idx = {_name: _id for _id, _name in idx2class.items()}
 
 classes = idx2class.values()
@@ -111,94 +110,95 @@ class XyzGen(object):
 
             for anno_i, anno in enumerate(annos):
                 obj_id = anno["obj_id"]
-                # read Pose
-                #pose = np.array(anno["pose"])
-                save_path_temp = osp.join(xyz_root, str(scene))
-                mmcv.mkdir_or_exist(osp.dirname(save_path_temp))
-                save_path = osp.join(save_path_temp, f"{int_im_id:06d}_{anno_i:06d}-xyz.pkl")
-                # if osp.exists(save_path) and osp.getsize(save_path) > 0:
-                #     continue
-                R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
-                t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
-                pose = np.hstack([R, t.reshape(3, 1)])
+                if obj_id in cls_indexes:
+                    # read Pose
+                    #pose = np.array(anno["pose"])
+                    save_path_temp = osp.join(xyz_root, str(scene))
+                    mmcv.mkdir_or_exist(osp.dirname(save_path_temp))
+                    save_path = osp.join(save_path_temp, f"{int_im_id:06d}_{anno_i:06d}-xyz.pkl")
+                    # if osp.exists(save_path) and osp.getsize(save_path) > 0:
+                    #     continue
+                    R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
+                    t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
+                    pose = np.hstack([R, t.reshape(3, 1)])
 
-                K_th = torch.tensor(K, dtype=torch.float32, device=device)
-                R_th = torch.tensor(R, dtype=torch.float32, device=device)
-                t_th = torch.tensor(t, dtype=torch.float32, device=device)
+                    K_th = torch.tensor(K, dtype=torch.float32, device=device)
+                    R_th = torch.tensor(R, dtype=torch.float32, device=device)
+                    t_th = torch.tensor(t, dtype=torch.float32, device=device)
 
-                cls_name = idx2class[obj_id]
-                render_obj_id = cls_indexes.index(obj_id)
-                self.get_renderer().render(
-                    [render_obj_id],
-                    pose,
-                    K=K,
-                    image_tensor=self.image_tensor,
-                    seg_tensor=self.seg_tensor,
-                    # pc_obj_tensor=self.pc_obj_tensor,
-                    pc_cam_tensor=self.pc_cam_tensor,
-                )
-
-                if VIS:
-                    bgr_gl = (self.image_tensor[:, :, :3].cpu().numpy() + 0.5).astype(np.uint8)
-
-                mask = (self.seg_tensor[:, :, 0] > 0).to(torch.uint8)
-                if mask.sum() == 0:  # NOTE: this should be ignored at training phase
-                    imName = osp.basename(im_path)
-                    print(f"not visible, cls {cls_name}, im {imName} obj {idx2class[obj_id]} {obj_id}")
-                    xyz_info = {
-                        "xyz_crop": np.zeros((IM_H, IM_W, 3), dtype=np.float16),
-                        "xyxy": [0, 0, IM_W - 1, IM_H - 1],
-                    }
-                    if VIS:
-                        im = mmcv.imread(im_path)
-
-                        mask_gt_rle = anno["mask_full"]
-                        mask_gt = cocosegm2mask(mask_gt_rle, IM_H, IM_W)
-                        mask_visib_rle = anno["mask_visib"]
-                        mask_visib_gt = cocosegm2mask(mask_visib_rle, IM_H, IM_W)
-
-                        show_ims = [
-                            bgr_gl[:, :, [2, 1, 0]],
-                            im[:, :, [2, 1, 0]],
-                            mask_gt,
-                            mask_visib_gt,
-                        ]
-                        show_titles = [
-                            "bgr_gl",
-                            "im",
-                            "mask_gt",
-                            "mask_visib_gt",
-                        ]
-                        grid_show(show_ims, show_titles, row=2, col=2)
-                        raise RuntimeError("{}".format(im_path))
-                else:
-                    ys_xs = mask.nonzero(as_tuple=False)
-                    ys, xs = ys_xs[:, 0], ys_xs[:, 1]
-                    x1, y1 = [xs.min().item(), ys.min().item()]
-                    x2, y2 = [xs.max().item(), ys.max().item()]
-
-                    # xyz_th = self.pc_obj_tensor[:, :, :3].detach()
-                    depth_th = self.pc_cam_tensor[:, :, 2].detach()
-                    xyz_th = misc.calc_xyz_bp_torch(depth_th, R_th, t_th, K_th)
-                    xyz_crop = xyz_th[y1 : y2 + 1, x1 : x2 + 1].cpu().numpy()
-                    xyz_info = {
-                        "xyz_crop": xyz_crop.astype("float16"),
-                        "xyxy": [x1, y1, x2, y2],
-                    }
+                    cls_name = idx2class[obj_id]
+                    render_obj_id = cls_indexes.index(obj_id)
+                    self.get_renderer().render(
+                        [render_obj_id],
+                        pose,
+                        K=K,
+                        image_tensor=self.image_tensor,
+                        seg_tensor=self.seg_tensor,
+                        # pc_obj_tensor=self.pc_obj_tensor,
+                        pc_cam_tensor=self.pc_cam_tensor,
+                    )
 
                     if VIS:
-                        xyz_th_cpu = xyz_th.cpu().numpy()
-                        print(f"xyz min {xyz_th_cpu.min()} max {xyz_th_cpu.max()}")
-                        show_ims = [
-                            bgr_gl[:, :, [2, 1, 0]],
-                            get_emb_show(xyz_th_cpu),
-                            get_emb_show(xyz_crop),
-                        ]
-                        show_titles = ["bgr_gl", "xyz", "xyz_crop"]
-                        grid_show(show_ims, show_titles, row=1, col=3)
+                        bgr_gl = (self.image_tensor[:, :, :3].cpu().numpy() + 0.5).astype(np.uint8)
 
-                mmcv.mkdir_or_exist(osp.dirname(save_path))
-                mmcv.dump(xyz_info, save_path)
+                    mask = (self.seg_tensor[:, :, 0] > 0).to(torch.uint8)
+                    if mask.sum() == 0:  # NOTE: this should be ignored at training phase
+                        imName = osp.basename(im_path)
+                        print(f"not visible, cls {cls_name}, im {imName} obj {idx2class[obj_id]} {obj_id}")
+                        xyz_info = {
+                            "xyz_crop": np.zeros((IM_H, IM_W, 3), dtype=np.float16),
+                            "xyxy": [0, 0, IM_W - 1, IM_H - 1],
+                        }
+                        if VIS:
+                            im = mmcv.imread(im_path)
+
+                            mask_gt_rle = anno["mask_full"]
+                            mask_gt = cocosegm2mask(mask_gt_rle, IM_H, IM_W)
+                            mask_visib_rle = anno["mask_visib"]
+                            mask_visib_gt = cocosegm2mask(mask_visib_rle, IM_H, IM_W)
+
+                            show_ims = [
+                                bgr_gl[:, :, [2, 1, 0]],
+                                im[:, :, [2, 1, 0]],
+                                mask_gt,
+                                mask_visib_gt,
+                            ]
+                            show_titles = [
+                                "bgr_gl",
+                                "im",
+                                "mask_gt",
+                                "mask_visib_gt",
+                            ]
+                            grid_show(show_ims, show_titles, row=2, col=2)
+                            raise RuntimeError("{}".format(im_path))
+                    else:
+                        ys_xs = mask.nonzero(as_tuple=False)
+                        ys, xs = ys_xs[:, 0], ys_xs[:, 1]
+                        x1, y1 = [xs.min().item(), ys.min().item()]
+                        x2, y2 = [xs.max().item(), ys.max().item()]
+
+                        # xyz_th = self.pc_obj_tensor[:, :, :3].detach()
+                        depth_th = self.pc_cam_tensor[:, :, 2].detach()
+                        xyz_th = misc.calc_xyz_bp_torch(depth_th, R_th, t_th, K_th)
+                        xyz_crop = xyz_th[y1 : y2 + 1, x1 : x2 + 1].cpu().numpy()
+                        xyz_info = {
+                            "xyz_crop": xyz_crop.astype("float16"),
+                            "xyxy": [x1, y1, x2, y2],
+                        }
+
+                        if VIS:
+                            xyz_th_cpu = xyz_th.cpu().numpy()
+                            print(f"xyz min {xyz_th_cpu.min()} max {xyz_th_cpu.max()}")
+                            show_ims = [
+                                bgr_gl[:, :, [2, 1, 0]],
+                                get_emb_show(xyz_th_cpu),
+                                get_emb_show(xyz_crop),
+                            ]
+                            show_titles = ["bgr_gl", "xyz", "xyz_crop"]
+                            grid_show(show_ims, show_titles, row=1, col=3)
+
+                    mmcv.mkdir_or_exist(osp.dirname(save_path))
+                    mmcv.dump(xyz_info, save_path)
         if self.renderer is not None:
             self.renderer.close()
 
