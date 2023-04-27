@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tlessSO/28"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture_SO/28"
 INPUT = dict(
     MIN_SIZE_TRAIN=540,
     MAX_SIZE_TRAIN=720,
@@ -41,7 +41,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("tless_28_train_pbr",),
+    TRAIN=("tless_random_texture_28_train_pbr",),
     TEST=("tless_bop_test_primesense",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
 )
