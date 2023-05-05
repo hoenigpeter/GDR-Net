@@ -86,7 +86,7 @@ class GDRN_Lite(LightningLite):
             return LVISEvaluator(dataset_name, cfg, True, output_folder)
 
         _distributed = self.world_size > 1
-        dataset_meta = MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
+        dataset_meta = MetadataCatalog.get(cfg.DATASETS.TEST[0])
         train_obj_names = dataset_meta.objs
         if evaluator_type == "bop":
             if cfg.VAL.get("USE_BOP", False):
