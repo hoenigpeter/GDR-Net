@@ -38,9 +38,9 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lm_7r_pbr_duck_train",),
-    TEST=("lm_13_test",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
+    #TRAIN=("lm_7r_pbr_duck_train",),
+    TEST=("lm_real_duck_test",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/lm_7r/test/test_bboxes/bbox_faster_all.json",),
 )
 
 MODEL = dict(
@@ -78,7 +78,7 @@ VAL = dict(
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
+    ERROR_TYPES="ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

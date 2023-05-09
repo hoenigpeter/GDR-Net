@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmSO/phone"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_SO/phone"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,8 +38,8 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lm_pbr_phone_train",),
-    TEST=("lm_13_test",),
+    #TRAIN=("lm_pbr_phone_train",),
+    TEST=("lm_real_phone_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
 
@@ -77,7 +77,8 @@ VAL = dict(
     DATASET_NAME="lm",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

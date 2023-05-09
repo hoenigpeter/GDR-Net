@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmSO/camera"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_SO/camera"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -8,7 +8,7 @@ INPUT = dict(
     COLOR_AUG_PROB=0.8,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
-        "Sequential([" 
+        "Sequential(["
         # Sometimes(0.5, PerspectiveTransform(0.05)),
         # Sometimes(0.5, CropAndPad(percent=(-0.05, 0.1))),
         # Sometimes(0.5, Affine(scale=(1.0, 1.2))),
@@ -38,8 +38,8 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lm_pbr_camera_train",),
-    TEST=("lm_13_test",),
+    #TRAIN=("lm_pbr_camera_train",),
+    TEST=("lm_real_camera_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
 
@@ -77,8 +77,8 @@ VAL = dict(
     DATASET_NAME="lm",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

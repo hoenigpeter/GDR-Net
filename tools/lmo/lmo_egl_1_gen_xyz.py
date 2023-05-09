@@ -16,7 +16,6 @@ from lib.vis_utils.image import grid_show
 from lib.pysixd import misc
 from lib.utils.mask_utils import cocosegm2mask
 
-
 idx2class = {
     1: "ape",
     #  2: 'benchvise',
@@ -59,7 +58,6 @@ texture_paths = None
 K = np.array([[572.4114, 0, 325.2611], [0, 573.57043, 242.04899], [0, 0, 1]])
 
 xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
-
 def normalize_to_01(img):
     if img.max() != img.min():
         return (img - img.min()) / (img.max() - img.min())

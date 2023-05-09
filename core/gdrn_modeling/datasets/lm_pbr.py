@@ -3,19 +3,20 @@ import logging
 import os
 import os.path as osp
 import sys
-
-cur_dir = osp.dirname(osp.abspath(__file__))
-PROJ_ROOT = osp.normpath(osp.join(cur_dir, "../../.."))
-sys.path.insert(0, PROJ_ROOT)
 import time
 from collections import OrderedDict
 import mmcv
 import numpy as np
 from tqdm import tqdm
 from transforms3d.quaternions import mat2quat, quat2mat
-import ref
 from detectron2.data import DatasetCatalog, MetadataCatalog
 from detectron2.structures import BoxMode
+
+cur_dir = osp.dirname(osp.abspath(__file__))
+PROJ_ROOT = osp.normpath(osp.join(cur_dir, "../../.."))
+sys.path.insert(0, PROJ_ROOT)
+
+import ref
 from lib.pysixd import inout, misc
 from lib.utils.mask_utils import binary_mask_to_rle, cocosegm2mask
 from lib.utils.utils import dprint, iprint, lazy_property
@@ -53,6 +54,7 @@ class LM_PBR_Dataset:
         self.use_cache = data_cfg.get("use_cache", True)
         self.num_to_load = data_cfg["num_to_load"]  # -1
         self.filter_invalid = data_cfg.get("filter_invalid", True)
+
         ##################################################
 
         # NOTE: careful! Only the selected objects
@@ -77,7 +79,11 @@ class LM_PBR_Dataset:
             (
                 "".join([str(fn) for fn in self.objs])
                 + "dataset_dicts_{}_{}_{}_{}_{}".format(
-                    self.name, self.dataset_root, self.with_masks, self.with_depth, __name__
+                    self.name,
+                    self.dataset_root,
+                    self.with_masks,
+                    self.with_depth,
+                    __name__,
                 )
             ).encode("utf-8")
         ).hexdigest()
@@ -112,6 +118,7 @@ class LM_PBR_Dataset:
                 scene_im_id = f"{scene_id}/{int_im_id}"
 
                 K = np.array(cam_dict[str_im_id]["cam_K"], dtype=np.float32).reshape(3, 3)
+
                 depth_factor = 1000.0 / cam_dict[str_im_id]["depth_scale"]  # 10000
 
                 record = {
@@ -135,7 +142,9 @@ class LM_PBR_Dataset:
                     R = np.array(anno["cam_R_m2c"], dtype="float32").reshape(3, 3)
                     t = np.array(anno["cam_t_m2c"], dtype="float32") / 1000.0
                     pose = np.hstack([R, t.reshape(3, 1)])
-                    quat = mat2quat(R).astype("float32")
+
+                    quat = mat2quat(pose[:3, :3]).astype("float32")
+                    trans = pose[:3, 3]
 
                     proj = (record["cam"] @ t.T).T
                     proj = proj[:2] / proj[2]
@@ -148,40 +157,54 @@ class LM_PBR_Dataset:
                             self.num_instances_without_valid_box += 1
                             continue
 
-                    mask_file = osp.join(scene_root, "mask/{:06d}_{:06d}.png".format(int_im_id, anno_i))
-                    mask_visib_file = osp.join(scene_root, "mask_visib/{:06d}_{:06d}.png".format(int_im_id, anno_i))
+                    mask_file = osp.join(
+                        scene_root,
+                        "mask/{:06d}_{:06d}.png".format(int_im_id, anno_i),
+                    )
+                    mask_visib_file = osp.join(
+                        scene_root,
+                        "mask_visib/{:06d}_{:06d}.png".format(int_im_id, anno_i),
+                    )
                     assert osp.exists(mask_file), mask_file
                     assert osp.exists(mask_visib_file), mask_visib_file
-                    # load mask visib  TODO: load both mask_visib and mask_full
+                    # load mask visib
                     mask_single = mmcv.imread(mask_visib_file, "unchanged")
+                    mask_single = mask_single.astype("bool")
                     area = mask_single.sum()
-                    if area < 3:  # filter out too small or nearly invisible instances
+                    if area < 32:  # filter out too small or nearly invisible instances
                         self.num_instances_without_valid_segmentation += 1
                         continue
+                    mask_rle = binary_mask_to_rle(mask_single, compressed=True)
+
+                    # load mask full
+                    mask_full = mmcv.imread(mask_file, "unchanged")
+                    mask_full = mask_full.astype("bool")
+                    mask_full_rle = binary_mask_to_rle(mask_full, compressed=True)
 
                     visib_fract = gt_info_dict[str_im_id][anno_i].get("visib_fract", 1.0)
 
-                    mask_rle = binary_mask_to_rle(mask_single, compressed=True)
-
-                    xyz_path = osp.join(self.xyz_root, f"{scene_id:06d}/{int_im_id:06d}_{anno_i:06d}-xyz.pkl")
-                    assert osp.exists(xyz_path), xyz_path
+                    xyz_path = osp.join(
+                        self.xyz_root,
+                        f"{scene_id:06d}/{int_im_id:06d}_{anno_i:06d}-xyz.pkl",
+                    )
+                    #assert osp.exists(xyz_path), xyz_path
                     inst = {
                         "category_id": cur_label,  # 0-based label
-                        "bbox": bbox_visib,  # TODO: load both bbox_obj and bbox_visib
+                        "bbox": bbox_visib,
+                        "bbox_obj": bbox_obj,
                         "bbox_mode": BoxMode.XYWH_ABS,
                         "pose": pose,
                         "quat": quat,
-                        "trans": t,
+                        "trans": trans,
                         "centroid_2d": proj,  # absolute (cx, cy)
                         "segmentation": mask_rle,
-                        "mask_full_file": mask_file,  # TODO: load as mask_full, rle
+                        "mask_full": mask_full_rle,
                         "visib_fract": visib_fract,
                         "xyz_path": xyz_path,
                     }
 
                     model_info = self.models_info[str(obj_id)]
                     inst["model_info"] = model_info
-                    # TODO: using full mask and full xyz
                     for key in ["bbox3d_and_center"]:
                         inst[key] = self.models[cur_label][key]
                     insts.append(inst)
@@ -231,7 +254,10 @@ class LM_PBR_Dataset:
         models = []
         for obj_name in self.objs:
             model = inout.load_ply(
-                osp.join(self.models_root, f"obj_{ref.lm_full.obj2id[obj_name]:06d}.ply"),
+                osp.join(
+                    self.models_root,
+                    f"obj_{ref.lm_full.obj2id[obj_name]:06d}.ply",
+                ),
                 vertex_scale=self.scale_to_meter,
             )
             # NOTE: the bbox3d_and_center is not obtained from centered vertices
@@ -287,7 +313,16 @@ LM_13_OBJECTS = [
     "lamp",
     "phone",
 ]  # no bowl, cup
-LM_OCC_OBJECTS = ["ape", "can", "cat", "driller", "duck", "eggbox", "glue", "holepuncher"]
+LM_OCC_OBJECTS = [
+    "ape",
+    "can",
+    "cat",
+    "driller",
+    "duck",
+    "eggbox",
+    "glue",
+    "holepuncher",
+]
 lm_model_root = "BOP_DATASETS/lm/models/"
 lmo_model_root = "BOP_DATASETS/lmo/models/"
 ################################################################################
@@ -332,14 +367,10 @@ SPLITS_LM_PBR = dict(
 
 # single obj splits
 for obj in ref.lm_full.objects:
-    for split in ["train"]:
+    for split in [
+        "train",
+    ]:
         name = "lm_pbr_{}_{}".format(obj, split)
-        if split in ["train"]:
-            filter_invalid = True
-        elif split in ["test"]:
-            filter_invalid = False
-        else:
-            raise ValueError("{}".format(split))
         if name not in SPLITS_LM_PBR:
             SPLITS_LM_PBR[name] = dict(
                 name=name,
@@ -355,18 +386,16 @@ for obj in ref.lm_full.objects:
                 cache_dir=osp.join(PROJ_ROOT, ".cache"),
                 use_cache=True,
                 num_to_load=-1,
-                filter_invalid=filter_invalid,
+                filter_invalid=True,
                 ref_key="lm_full",
             )
 
 # lmo single objs
 for obj in ref.lmo_full.objects:
-    for split in ["train"]:
-        name = "lmo_pbr_{}_{}".format(obj, split)
-        if split in ["train"]:
-            filter_invalid = True
-        else:
-            raise ValueError("{}".format(split))
+    for split in [
+        "train",
+    ]:
+        name = "lmo_{}_{}_pbr".format(obj, split)
         if name not in SPLITS_LM_PBR:
             SPLITS_LM_PBR[name] = dict(
                 name=name,
@@ -382,7 +411,7 @@ for obj in ref.lmo_full.objects:
                 cache_dir=osp.join(PROJ_ROOT, ".cache"),
                 use_cache=True,
                 num_to_load=-1,
-                filter_invalid=filter_invalid,
+                filter_invalid=True,
                 ref_key="lmo_full",
             )
 
@@ -405,7 +434,6 @@ def register_with_name_cfg(name, data_cfg=None):
     DatasetCatalog.register(name, LM_PBR_Dataset(used_cfg))
     # something like eval_types
     MetadataCatalog.get(name).set(
-        id="linemod",  # NOTE: for pvnet to determine module
         ref_key=used_cfg["ref_key"],
         objs=used_cfg["objs"],
         eval_error_types=["ad", "rete", "proj"],
@@ -434,7 +462,7 @@ def test_vis():
     dirname = "output/{}-data-vis".format(dset_name)
     os.makedirs(dirname, exist_ok=True)
     for d in dicts:
-        img = read_image_cv2(d["file_name"], format="BGR")
+        img = read_image_mmcv(d["file_name"], format="BGR")
         depth = mmcv.imread(d["depth_file"], "unchanged") / 10000.0
 
         imH, imW = img.shape[:2]
@@ -457,7 +485,10 @@ def test_vis():
         labels = [objs[cat_id] for cat_id in cat_ids]
         for _i in range(len(annos)):
             img_vis = vis_image_mask_bbox_cv2(
-                img, masks[_i : _i + 1], bboxes=bboxes_xyxy[_i : _i + 1], labels=labels[_i : _i + 1]
+                img,
+                masks[_i : _i + 1],
+                bboxes=bboxes_xyxy[_i : _i + 1],
+                labels=labels[_i : _i + 1],
             )
             img_vis_kpts2d = misc.draw_projected_box3d(img_vis.copy(), kpts_2d[_i])
             xyz_path = annos[_i]["xyz_path"]
@@ -510,18 +541,18 @@ if __name__ == "__main__":
     """Test the  dataset loader.
 
     Usage:
-        python -m core.datasets.lm_pbr dataset_name
+        python -m this_module dataset_name
     """
     from lib.vis_utils.image import grid_show
-    from lib.utils.setup_logger import setup_logger
+    from lib.utils.setup_logger import setup_my_logger
 
     import detectron2.data.datasets  # noqa # add pre-defined metadata
     from lib.vis_utils.image import vis_image_mask_bbox_cv2
     from core.utils.utils import get_emb_show
-    from core.utils.data_utils import read_image_cv2
+    from core.utils.data_utils import read_image_mmcv
 
     print("sys.argv:", sys.argv)
-    setup_logger()
+    logger = setup_my_logger(name="core")
     register_with_name_cfg(sys.argv[1])
     print("dataset catalog: ", DatasetCatalog.list())
 

@@ -473,7 +473,7 @@ for obj in ref.lm_full.objects:
         if split in ["train", "all"]:  # all is used to train lmo
             filter_invalid = True
         elif split in ["test"]:
-            filter_invalid = False
+            filter_invalid = True
         else:
             raise ValueError("{}".format(split))
         if name not in SPLITS_LM:
@@ -529,7 +529,7 @@ for obj in ref.lmo_full.objects:
                 use_cache=True,
                 num_to_load=-1,
                 filter_scene=False,
-                filter_invalid=False,
+                filter_invalid=filter_invalid,
                 ref_key="lmo_full",
             )
 
@@ -562,7 +562,7 @@ for obj in ref.lmo_full.objects:
                 use_cache=True,
                 num_to_load=-1,
                 filter_scene=False,
-                filter_invalid=False,
+                filter_invalid=filter_invalid,
                 ref_key="lmo_full",
             )
 
