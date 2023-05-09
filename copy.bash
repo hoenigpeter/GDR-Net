@@ -6,7 +6,7 @@ do
     # Construct the folder name using the current number
     folder=$(printf "%06d" "$i")
     # Replace the "ape" string with the current folder name in the command
-    command="scp -r datasets/BOP_DATASETS/tless_random_texture/train_pbr/${folder} peter@192.168.141.42:/home/peter/GDRNet/datasets/BOP_DATASETS/tless_random_texture/train_pbr/${folder}"
+    command="scp -r datasets/BOP_DATASETS/lmo_50k_mix/train_pbr/${folder} peter@192.168.141.42:/home/peter/GDRNet/datasets/BOP_DATASETS/lmo_50k_mix/train_pbr/${folder}"
     # Execute the command
     eval "$command"
 done

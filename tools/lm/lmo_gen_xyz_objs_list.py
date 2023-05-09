@@ -17,41 +17,41 @@ from lib.pysixd import misc
 from lib.utils.mask_utils import cocosegm2mask
 
 
-idx2class = {
-    1: "ape",
-    2: 'benchvise',
-    3: 'bowl',
-    4: 'camera',
-    5: "can",
-    6: "cat",
-    7: 'cup',
-    8: "driller",
-    9: "duck",
-    10: "eggbox",
-    11: "glue",
-    12: "holepuncher",
-    13: 'iron',
-    14: 'lamp',
-    15: 'phone'
-}
-
 # idx2class = {
 #     1: "ape",
-#     #  2: 'benchvise',
-#     #  3: 'bowl',
-#     #  4: 'camera',
+#     2: 'benchvise',
+#     3: 'bowl',
+#     4: 'camera',
 #     5: "can",
 #     6: "cat",
-#     #  7: 'cup',
+#     7: 'cup',
 #     8: "driller",
 #     9: "duck",
 #     10: "eggbox",
 #     11: "glue",
 #     12: "holepuncher",
-#     #  13: 'iron',
-#     #  14: 'lamp',
-#     #  15: 'phone'
+#     13: 'iron',
+#     14: 'lamp',
+#     15: 'phone'
 # }
+
+idx2class = {
+    1: "ape",
+    #  2: 'benchvise',
+    #  3: 'bowl',
+    #  4: 'camera',
+    5: "can",
+    6: "cat",
+    #  7: 'cup',
+    8: "driller",
+    9: "duck",
+    10: "eggbox",
+    11: "glue",
+    12: "holepuncher",
+    #  13: 'iron',
+    #  14: 'lamp',
+    #  15: 'phone'
+}
 
 class2idx = {_name: _id for _id, _name in idx2class.items()}
 
