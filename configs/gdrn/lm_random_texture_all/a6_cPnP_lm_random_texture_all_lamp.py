@@ -40,7 +40,7 @@ SOLVER = dict(
 DATASETS = dict(
     #TRAIN=("lm_random_texture_all_pbr_lamp_train",),
     TEST=("lm_real_lamp_test",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/lm_random_texture_all/test/test_bboxes/bbox_faster_all.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
 
 MODEL = dict(
