@@ -20,7 +20,7 @@ bop_root = osp.join(data_root, "BOP_DATASETS/")
 # ---------------------------------------------------------------- #
 # LINEMOD OCCLUSION DATASET
 # ---------------------------------------------------------------- #
-dataset_root = osp.join(bop_root, "lmo_3r")
+dataset_root = osp.join(bop_root, "lmo_50k_mix")
 train_dir = osp.join(dataset_root, "train")
 test_dir = osp.join(dataset_root, "test")
 model_dir = osp.join(dataset_root, "models")

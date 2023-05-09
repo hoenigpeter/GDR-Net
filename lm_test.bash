@@ -23,18 +23,32 @@ do
     done
 done
 
+# for i in "${!lm_variants[@]}"
+# do
+#     lm_variant="${lm_variants[i]}"
+#     lmo_variant="${lmo_variants[i]}"
+    
+#     for lmo_object in "${lmo_objects[@]}"
+#     do
+#     # Replace the "ape" string with the current model string in the command
+#     command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${lm_variant[@]}/a6_cPnP_${lm_variant[@]}_${lmo_object}.py 0 output/gdrn/40_epochs/${lmo_variant[@]}_SO/${lmo_object}/model_final.pth"
+    
+#     # Execute the command
+#     eval "$command"
+#     done
+# done
+
 for i in "${!lm_variants[@]}"
 do
     lm_variant="${lm_variants[i]}"
     lmo_variant="${lmo_variants[i]}"
     
-    for lmo_object in "${lmo_objects[@]}"
+    for lm_only_object in "${lm_only_objects[@]}"
     do
     # Replace the "ape" string with the current model string in the command
-    command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${lm_variant[@]}/a6_cPnP_${lm_variant[@]}_${lmo_object}.py 0 output/gdrn/40_epochs/${lmo_variant[@]}_SO/${lmo_object}/model_final.pth"
+    command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${lm_variant[@]}/a6_cPnP_${lm_variant[@]}_${lm_only_object}.py 0 output/gdrn/40_epochs/${lm_variant[@]}_SO/${lm_only_object}/model_final.pth"
     
     # Execute the command
     eval "$command"
     done
 done
-
