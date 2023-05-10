@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_3r_SO/OBJ"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_SO/_all"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -26,7 +26,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=80,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -38,8 +38,8 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lm_3r_pbr_OBJ_train",),
-    TEST=("lm_real_OBJ_test",),
+    #TRAIN=("lm_pbr_13_train",),
+    TEST=("lm_13_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
 
@@ -72,18 +72,17 @@ MODEL = dict(
         TRANS_HEAD=dict(ENABLED=False),
     ),
 )
-
 VAL = dict(
     DATASET_NAME="lm",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="ad",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
     N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
-    EVAL_CACHED=False,  # if the predicted poses have been saved
+    EVAL_CACHED=True,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall

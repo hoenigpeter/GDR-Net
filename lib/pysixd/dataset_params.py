@@ -76,7 +76,7 @@ def get_model_params(datasets_path, dataset_name, model_type=None):
     """
     # Object ID's.
     obj_ids = {
-        "lm": list(range(1, 16)),
+        "lm": [1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15],
         "lmo": [1, 5, 6, 8, 9, 10, 11, 12],
         "tless": list(range(1, 31)),
         "tudl": list(range(1, 4)),
@@ -97,7 +97,7 @@ def get_model_params(datasets_path, dataset_name, model_type=None):
     # ID's of objects with ambiguous views evaluated using the ADI pose error
     # function (the others are evaluated using ADD). See Hodan et al. (ECCVW'16).
     symmetric_obj_ids = {
-        "lm": [3, 7, 10, 11],
+        "lm": [10, 11],
         "lmo": [10, 11],
         "tless": list(range(1, 31)),
         "tudl": [],

@@ -173,7 +173,7 @@ for error_dir_path in p["error_dir_paths"]:
 
     model_type = "eval"
     dp_model = dataset_params.get_model_params(p["datasets_path"], dataset, model_type)
-
+    print(dp_model)
     # Load info about the object models.
     models_info = inout.load_json(dp_model["models_info_path"], keys_to_int=True)
 

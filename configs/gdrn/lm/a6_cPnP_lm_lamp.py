@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_SO/lamp"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmIANT_SO/lamp"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lm_pbr_lamp_train",),
+    #TRAIN=("lmIANT_pbr_lamp_train",),
     TEST=("lm_real_lamp_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )
