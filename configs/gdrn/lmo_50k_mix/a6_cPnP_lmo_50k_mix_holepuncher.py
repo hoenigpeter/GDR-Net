@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmoSO/holepuncher"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_50k_mix_SO/holepuncher"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -39,7 +39,7 @@ SOLVER = dict(
 
 DATASETS = dict(
     TRAIN=("lmo_50k_mix_pbr_holepuncher_train",),
-    TEST=("lmo_test",),
+    TEST=("lmo_holepuncher_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
@@ -80,9 +80,9 @@ MODEL = dict(
 VAL = dict(
     DATASET_NAME="lmo",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    TARGETS_FILENAME="test_targets_all.json",
+    TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
+    ERROR_TYPES="ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

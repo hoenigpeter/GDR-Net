@@ -38,17 +38,45 @@ done
 #     done
 # done
 
+# for i in "${!lm_variants[@]}"
+# do
+#     lm_variant="${lm_variants[i]}"
+#     lmo_variant="${lmo_variants[i]}"
+    
+#     for lm_only_object in "${lm_only_objects[@]}"
+#     do
+#     # Replace the "ape" string with the current model string in the command
+#     command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${lm_variant[@]}/a6_cPnP_${lm_variant[@]}_${lm_only_object}.py 0 output/gdrn/40_epochs/${lm_variant[@]}_SO/${lm_only_object}/model_final.pth"
+    
+#     # Execute the command
+#     eval "$command"
+#     done
+# done
+
+lm_minus_variants=("lm" "lm-3r" "lm-5r" "lm-7r" "lm-random-texture-all")
+
 for i in "${!lm_variants[@]}"
 do
     lm_variant="${lm_variants[i]}"
-    lmo_variant="${lmo_variants[i]}"
+    lm_minus_variant="${lm_minus_variants[i]}"
     
-    for lm_only_object in "${lm_only_objects[@]}"
+    # Set the directory path
+    DIR="./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/csv_files"
+
+    # Check if the directory exists
+    if [ ! -d "$DIR" ]
+    then
+        # Create the directory if it does not exist
+        mkdir -p "$DIR"
+    fi
+
+    for lm_object in "${lm_objects[@]}"
     do
     # Replace the "ape" string with the current model string in the command
-    command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${lm_variant[@]}/a6_cPnP_${lm_variant[@]}_${lm_only_object}.py 0 output/gdrn/40_epochs/${lm_variant[@]}_SO/${lm_only_object}/model_final.pth"
-    
+    command="cp ./output/gdrn/40_epochs/${lm_variant[@]}_SO/${lm_object}/inference_model_final/lm_real_${lm_object}_test/a6-cPnP-${lm_minus_variant[@]}-${lm_object}-test-iter0_lm-test.csv ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/csv_files/a6-cPnP-${lm_minus_variant[@]}-${lm_object}-test-iter0_lm-test.csv"
+
     # Execute the command
     eval "$command"
     done
 done
+
