@@ -24,6 +24,12 @@ INPUT = dict(
     ),
 )
 
+# DATALOADER = dict(
+#     # Number of data loading threads
+#     NUM_WORKERS=8,
+#     FILTER_VISIB_THR=0.3,
+# )
+
 SOLVER = dict(
     IMS_PER_BATCH=24,
     TOTAL_EPOCHS=40,
@@ -38,12 +44,13 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_7r_pbr_train",),
-    TEST=("lmo_test",),
+    #TRAIN=("lmo_7r_pbr_train",),
+    TEST=("lmo_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
         "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
+        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",
     ),
 )
 
@@ -80,11 +87,9 @@ MODEL = dict(
 VAL = dict(
     DATASET_NAME="lmo",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
-    #TARGETS_FILENAME="test_targets_all.json",
     TARGETS_FILENAME="test_targets_bop19.json",
     ERROR_TYPES="mspd,mssd,vsd,ad",
-    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    RENDERER_TYPE="egl",  # cpp, python, egl
+    RENDERER_TYPE="cpp",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
     N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)

@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_pbr_holepuncher_train",),
+    #TRAIN=("lmo_pbr_holepuncher_train",),
     TEST=("lmo_holepuncher_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449

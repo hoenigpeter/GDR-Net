@@ -38,6 +38,19 @@ do
         sed -e "s/VAR/${variant}/g" "$INPUT_FILE" > "$OUTPUT_FILE"
 done
 
+# Generate the config file for testing shared LM
+for variant in "${lm_variants[@]}"
+do
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+    # Set the input and output file paths
+        INPUT_FILE="$SCRIPT_DIR/configs/gdrn/_a6_cPnP_lm_conf.py"
+        OUTPUT_FILE="$SCRIPT_DIR/configs/gdrn/${variant[@]}/a6_cPnP_${variant[@]}.py"
+
+        # Replace "ape" with the current object name in the input file and save to the output file
+        sed -e "s/VAR/${variant}/g" "$INPUT_FILE" > "$OUTPUT_FILE"
+done
+
 # for i in "${!lm_variants[@]}"
 # do
 #     lm_variant="${lm_variants[i]}"
