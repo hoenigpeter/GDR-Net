@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_50k_mix_pbr_cat_train",),
+    #TRAIN=("lmo_50k_mix_pbr_cat_train",),
     TEST=("lmo_cat_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449

@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_random_texture_allIANT_SO/camera"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_random_texture_all_SO/camera"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lm_random_texture_allIANT_pbr_camera_train",),
+    TRAIN=("lm_random_texture_all_pbr_camera_train",),
     TEST=("lm_real_camera_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )

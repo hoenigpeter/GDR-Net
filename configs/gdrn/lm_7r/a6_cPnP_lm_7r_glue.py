@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_7rIANT_SO/glue"
+OUTPUT_DIR = "output/gdrn/40_epochs/lm_7r_SO/glue"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lm_7rIANT_pbr_glue_train",),
+    TRAIN=("lm_7r_pbr_glue_train",),
     TEST=("lm_real_glue_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )

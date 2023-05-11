@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/VARIANT_SO/OBJ"
+OUTPUT_DIR = "output/gdrn/40_epochs/VAR_SO/OBJ"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("VARIANT_pbr_OBJ_train",),
+    TRAIN=("VAR_pbr_OBJ_train",),
     TEST=("lm_real_OBJ_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
 )

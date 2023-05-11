@@ -356,7 +356,7 @@ for obj in ref.lmo_full.objects:
                 filter_invalid=filter_invalid,
                 ref_key="lmo_50k_mix_full",
             )
-# lmo single objs
+# lm single objs
 for obj in ref.lm_full.objects:
     for split in ["train"]:
         name = "lm_50k_mix_pbr_{}_{}".format(obj, split)
@@ -368,9 +368,9 @@ for obj in ref.lm_full.objects:
             SPLITS_LM_PBR[name] = dict(
                 name=name,
                 objs=[obj],  # only this obj
-                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_50k_mix/train_pbr"),
-                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_50k_mix/models"),
-                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_50k_mix/train_pbr/xyz_crop"),
+                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_50k_mix/train_pbr"),
+                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_50k_mix/models"),
+                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm_50k_mix/train_pbr/xyz_crop"),
                 scale_to_meter=0.001,
                 with_masks=True,  # (load masks but may not use it)
                 with_depth=True,  # (load depth path here, but may not use it)
@@ -380,7 +380,7 @@ for obj in ref.lm_full.objects:
                 use_cache=True,
                 num_to_load=-1,
                 filter_invalid=filter_invalid,
-                ref_key="lmo_50k_mix_full",
+                ref_key="lm_50k_mix_full",
             )
 
 def register_with_name_cfg(name, data_cfg=None):
