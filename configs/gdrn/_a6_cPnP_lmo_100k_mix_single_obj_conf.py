@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("VAR_pbr_OBJ_train",),
+    TRAIN=("lmo_pbr_OBJ_train", "lmo_random_texture_all_pbr_OBJ_train"),
     TEST=("lmo_OBJ_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449

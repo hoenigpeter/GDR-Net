@@ -395,7 +395,7 @@ for obj in ref.lmo_full.objects:
     for split in [
         "train",
     ]:
-        name = "lmo_{}_{}_pbr".format(obj, split)
+        name = "lmo_pbr_{}_{}".format(obj, split)
         if name not in SPLITS_LM_PBR:
             SPLITS_LM_PBR[name] = dict(
                 name=name,
