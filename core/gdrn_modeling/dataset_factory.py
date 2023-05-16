@@ -25,7 +25,8 @@ from .datasets import (
     lmo_5r_pbr,
     lmo_7r_pbr,
     lmo_3r_1o_pbr,
-    lmo_5r_1o_pbr
+    lmo_5r_1o_pbr,
+    icbin_pbr
 )
 
 cur_dir = osp.dirname(osp.abspath(__file__))
@@ -51,7 +52,8 @@ _DSET_MOD_NAMES = [
     "lmo_5r_pbr",
     "lmo_7r_pbr",
     "lmo_3r_1o_pbr",
-    "lmo_5r_1o_pbr"
+    "lmo_5r_1o_pbr",
+    "icbin_pbr"
 ]
 
 logger = logging.getLogger(__name__)
