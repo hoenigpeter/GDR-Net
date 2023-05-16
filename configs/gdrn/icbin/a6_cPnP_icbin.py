@@ -1,11 +1,7 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tlessSO/18"
+OUTPUT_DIR = "output/gdrn/40_epochs/icbin"
 INPUT = dict(
-    MIN_SIZE_TRAIN=540,
-    MAX_SIZE_TRAIN=720,
-    MIN_SIZE_TEST=540,
-    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
@@ -30,20 +26,21 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=100,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
-    OPTIMIZER_CFG=dict(_delete_=True, type="Ranger", lr=8e-4, weight_decay=0.01),
+    # REL_STEPS=(0.3125, 0.625, 0.9375),
+    OPTIMIZER_CFG=dict(_delete_=True, type="Ranger", lr=1e-4, weight_decay=0),
     WEIGHT_DECAY=0.0,
     WARMUP_FACTOR=0.001,
     WARMUP_ITERS=1000,
 )
 
 DATASETS = dict(
-    TRAIN=("tless_18_train_pbr",),
-    TEST=("tless_bop_test_primesense",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    TRAIN=("icbin_train_pbr",),
+    TEST=("icbin_bop_test",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/icbin/test/test_bboxes/yolox_x_640_icbin_pbr_icbin_bop_test.json",),
 )
 
 MODEL = dict(
@@ -75,18 +72,16 @@ MODEL = dict(
         TRANS_HEAD=dict(ENABLED=False),
     ),
 )
-
 VAL = dict(
-    DATASET_NAME="tless",
+    DATASET_NAME="icbin",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    #ERROR_TYPES="mspd,mssd,vsd,ad",
-    ERROR_TYPES="ad",
-    #RENDERER_TYPE="cpp",  # cpp, python, egl
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
-    N_TOP=-1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
+    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
     EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
