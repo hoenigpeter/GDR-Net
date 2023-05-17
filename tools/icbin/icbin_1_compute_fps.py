@@ -4,7 +4,7 @@ import sys
 from tqdm import tqdm
 
 cur_dir = osp.dirname(osp.abspath(__file__))
-sys.path.insert(0, osp.join(cur_dir, "../../../../"))
+sys.path.insert(0, osp.join(cur_dir, "../.."))
 import mmcv
 from lib.pysixd import inout, misc
 import ref
