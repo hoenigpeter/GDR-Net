@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_100k_mix_SO/ape"
+OUTPUT_DIR = "output/gdrn/40_epochs/icbin_SO/juice_carton"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,13 +38,9 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lmo_100k_mix_pbr_ape_train",),
-    TEST=("lmo_ape_bop_test",),
-    # AP	AP50	AR	inf.time
-    # 60.657	89.625	66.2	0.024449
-    DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
-    ),
+    TRAIN=("icbin_juice_carton_train_pbr"),
+    TEST=("icbin_juice_carton_test",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/icbin/test/test_bboxes/yolox_x_640_icbin_pbr_icbin_bop_test.json",),
 )
 
 MODEL = dict(
@@ -78,7 +74,7 @@ MODEL = dict(
 )
 
 VAL = dict(
-    DATASET_NAME="lmo",
+    DATASET_NAME="icbin",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",

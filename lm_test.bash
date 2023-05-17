@@ -36,7 +36,7 @@ do
 
     # Set the input and output file paths
         INPUT_FILE="$SCRIPT_DIR/configs/gdrn/_a6_cPnP_lm_1_per_obj_conf.py"
-        OUTPUT_FILE="$SCRIPT_DIR/configs/gdrn/${variant[@]}/a6_cPnP_${variant[@]}_1_per_obj_conf.py"
+        OUTPUT_FILE="$SCRIPT_DIR/configs/gdrn/${variant[@]}/a6_cPnP_${variant[@]}_1_per_obj.py"
 
         # Replace "ape" with the current object name in the input file and save to the output file
         sed -e "s/VAR/${variant}/g" "$INPUT_FILE" > "$OUTPUT_FILE"
@@ -144,7 +144,7 @@ done
         mkdir -p "$DIR"
     fi
 
-    command="cp ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/csv_files/concatenated_result_files.csv ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/inference_dummy/lm_13_test/a6-cPnP-${lm_minus_variant[@]}-1-per-obj-conf-iter0_lm-test.csv"
+    command="cp ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/csv_files/concatenated_result_files.csv ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/inference_dummy/lm_13_test/a6-cPnP-${lm_minus_variant[@]}-1-per-obj-iter0_lm-test.csv"
     eval "$command"
     command="cp -R -u -p ./output/gdrn/40_epochs/dummy.pth ./output/gdrn/40_epochs/${lm_variant[@]}_SO/_all/dummy.pth"
     eval "$command"

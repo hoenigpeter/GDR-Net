@@ -341,12 +341,12 @@ for obj in ref.icbin.objects:
         "bop_test",
     ]:
         name = "icbin_{}_{}".format(obj, split)
-        ann_files = [
-            osp.join(
-                DATASETS_ROOT,
-                "BOP_DATASETS/icbin/image_set/{}_{}.txt".format(obj, split),
-            )
-        ]
+        # ann_files = [
+        #     osp.join(
+        #         DATASETS_ROOT,
+        #         "BOP_DATASETS/icbin/image_set/{}_{}.txt".format(obj, split),
+        #     )
+        # ]
         if name not in SPLITS_ICBIN:
             SPLITS_ICBIN[name] = dict(
                 name=name,
