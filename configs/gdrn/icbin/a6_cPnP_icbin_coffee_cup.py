@@ -39,7 +39,7 @@ SOLVER = dict(
 
 DATASETS = dict(
     TRAIN=("icbin_coffee_cup_train_pbr",),
-    TEST=("icbin_coffee_cup_test",),
+    TEST=("icbin_coffee_cup_bop_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/icbin/test/test_bboxes/yolox_x_640_icbin_pbr_icbin_bop_test.json",),
 )
 
