@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/itodd_pbr/1"
+OUTPUT_DIR = "output/gdrn/40_epochs/itodd_random_texture/14"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=False,
@@ -42,10 +42,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("itodd_1_train_pbr",),
-    TEST=("itodd_1_bop_test",),
+    TRAIN=("itodd_random_texture_14_train_pbr",),
+    TEST=("itodd_14_bop_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_x_640_itodd_pbr_itodd_bop_test.json",),
-    DET_TOPK_PER_OBJ=100,
+    DET_TOPK_PER_14=100,
     DET_THR=0.05,
 )
 

@@ -30,6 +30,7 @@ from .datasets import (
     icbin_random_texture_pbr,
     icbin_bop_test,
     itodd_pbr,
+    itodd_random_texture_pbr,
     itodd_d2,
     itodd_bop_test
 )
@@ -62,6 +63,7 @@ _DSET_MOD_NAMES = [
     "icbin_random_texture_pbr",
     "icbin_bop_test",
     "itodd_pbr",
+    "itodd_random_texture_pbr",
     "itodd_d2",
     "itodd_bop_test"
 ]
