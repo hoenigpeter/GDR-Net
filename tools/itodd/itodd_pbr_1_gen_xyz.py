@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 
 cur_dir = osp.abspath(osp.dirname(__file__))
-PROJ_ROOT = osp.join(cur_dir, "../..")
+PROJ_ROOT = osp.join(cur_dir, "../../../..")
 sys.path.insert(0, PROJ_ROOT)
 from lib.egl_renderer.egl_renderer_v3 import EGLRenderer
 from lib.vis_utils.image import grid_show
@@ -17,7 +17,7 @@ from lib.pysixd import misc
 from lib.utils.mask_utils import cocosegm2mask
 
 
-idx2class = {1: "coffee_cup", 2: "juice_carton"}
+idx2class = {i: str(i) for i in range(1, 28 + 1)}
 
 class2idx = {_name: _id for _id, _name in idx2class.items()}
 
@@ -25,16 +25,16 @@ classes = idx2class.values()
 classes = sorted(classes)
 
 # DEPTH_FACTOR = 1000.
-IM_H = 480
-IM_W = 640
+IM_H = 960
+IM_W = 1280
 near = 0.01
 far = 6.5
 
-data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/icbin/train_pbr"))
+data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/itodd/train_pbr"))
 
 cls_indexes = [_idx for _idx in sorted(idx2class.keys())]
 cls_names = [idx2class[cls_idx] for cls_idx in cls_indexes]
-model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/icbin/models"))
+model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/itodd/models"))
 model_paths = [osp.join(model_dir, f"obj_{cls_idx:06d}.ply") for cls_idx in cls_indexes]
 texture_paths = None
 
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     import setproctitle
     import torch
 
-    parser = argparse.ArgumentParser(description="gen icbin pbr xyz")
+    parser = argparse.ArgumentParser(description="gen itodd pbr xyz")
     parser.add_argument("--gpu", type=str, default="0", help="gpu")
     parser.add_argument("--vis", default=False, action="store_true", help="vis")
     args = parser.parse_args()

@@ -136,7 +136,7 @@ def eval_cached_results(cfg, output_dir, obj_ids=None):
 
 
 def get_data_ref(dataset_name):
-    ref_key_dict = {"lm": "lm_full", "lmo": "lmo_full", "ycbv": "ycbv", "ycbvposecnn": "ycbv", "tless": "tless"}
+    ref_key_dict = {"lm": "lm_full", "lmo": "lmo_full", "ycbv": "ycbv", "ycbvposecnn": "ycbv", "tless": "tless", "icbin": "icbin"}
     ref_key = ref_key_dict[dataset_name]
     return ref.__dict__[ref_key]
 

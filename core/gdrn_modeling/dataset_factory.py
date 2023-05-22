@@ -27,7 +27,11 @@ from .datasets import (
     lmo_3r_1o_pbr,
     lmo_5r_1o_pbr,
     icbin_pbr,
-    icbin_bop_test
+    icbin_random_texture_pbr,
+    icbin_bop_test,
+    itodd_pbr,
+    itodd_d2,
+    itodd_bop_test
 )
 
 cur_dir = osp.dirname(osp.abspath(__file__))
@@ -55,7 +59,11 @@ _DSET_MOD_NAMES = [
     "lmo_3r_1o_pbr",
     "lmo_5r_1o_pbr",
     "icbin_pbr",
-    "icbin_bop_test"
+    "icbin_random_texture_pbr",
+    "icbin_bop_test",
+    "itodd_pbr",
+    "itodd_d2",
+    "itodd_bop_test"
 ]
 
 logger = logging.getLogger(__name__)
