@@ -99,6 +99,7 @@ VAL = dict(
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall
     USE_BOP=True,  # whether to use bop toolkit
+    SAVE_BOP_CSV_ONLY=True,
 )
 
 TEST = dict(EVAL_PERIOD=0, VIS=False, TEST_BBOX_TYPE="est")  # gt | est

@@ -1,5 +1,7 @@
 import logging
 
+import cv2
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -231,6 +233,34 @@ class GDRN(nn.Module):
             raise ValueError(f"Unknown pnp_net trans type: {pnp_net_cfg.TRANS_TYPE}")
 
         if not do_loss:  # test
+            # print("Est. Mvis (Mask) size: ", mask.size())
+            # print("Est. Msra (Surface Region Attention) size: ", region.size())
+            # print("Est. Mxyz: ", coor_x.size(), coor_y.size(), coor_z.size())
+
+            x_cpu = coor_x.cpu()
+            x_img = x_cpu.numpy()
+
+            y_cpu = coor_y.cpu()
+            y_img = y_cpu.numpy()
+
+            z_cpu = coor_z.cpu()
+            z_img = z_cpu.numpy()
+
+            # Combine the arrays along the second axis (axis=1)
+            combined_array = np.concatenate((x_img, y_img, z_img), axis=1)
+
+            # Normalize the combined array to the range of 0-255
+            combined_array = (combined_array - combined_array.min()) * (255 / (combined_array.max() - combined_array.min()))
+
+            # Convert the array to 8-bit unsigned integer type
+            combined_array = np.uint8(combined_array)
+
+            # Transpose the array to have shape (64, 64, 3) for RGB image format
+            combined_array = np.transpose(combined_array.squeeze(), (1, 2, 0))
+
+            # Create an RGB image from the combined array
+            dcm_image = cv2.cvtColor(combined_array, cv2.COLOR_RGB2BGR)
+
             out_dict = {"rot": pred_ego_rot, "trans": pred_trans}
             if cfg.TEST.USE_PNP:
                 # TODO: move the pnp/ransac inside forward
@@ -303,7 +333,7 @@ class GDRN(nn.Module):
             storage.put_scalars(**vis_dict)
 
             return out_dict, loss_dict
-        return out_dict
+        return out_dict, dcm_image
 
     def gdrn_loss(
         self,

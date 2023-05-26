@@ -158,6 +158,7 @@ VAL = dict(
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall
     USE_BOP=False,  # whether to use bop toolkit
+    SAVE_BOP_CSV_ONLY=False,
 )
 
 # ---------------------------------------------------------------------------- #
