@@ -38,9 +38,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lm_random_texture_all_pbr_iron_train",),
+    #TRAIN=("lm_random_texture_all_pbr_iron_train",),
     TEST=("lm_real_iron_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_yolov3_all.json",),
 )
 
 MODEL = dict(

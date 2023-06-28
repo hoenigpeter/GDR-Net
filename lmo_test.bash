@@ -2,8 +2,8 @@
 
 lmo_objects=("ape" "can" "cat" "driller" "duck" "eggbox" "glue" "holepuncher")
 
-lmo_variants=("lmo_100k_mix")
-lmo_minus_variants=("lmo-100k-mix")
+lmo_variants=("lmo" "lmo_random_texture_all")
+lmo_minus_variants=("lmo" "lmo-random-texture-all")
 
 # lmo_objects=("ape" "can" "cat" "driller" "duck" "eggbox" "glue" "holepuncher")
 
@@ -51,7 +51,6 @@ done
 #test object models LMO
 for lmo_variant in "${lmo_variants[@]}"
 do
-    
     for lmo_object in "${lmo_objects[@]}"
     do
     # Replace the "ape" string with the current model string in the command

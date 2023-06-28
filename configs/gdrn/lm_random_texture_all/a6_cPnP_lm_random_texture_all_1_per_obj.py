@@ -41,6 +41,7 @@ DATASETS = dict(
     #TRAIN=("lm_random_texture_all_pbr_13_train",),
     TEST=("lm_13_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_yolov3_all.json",),
 )
 
 MODEL = dict(

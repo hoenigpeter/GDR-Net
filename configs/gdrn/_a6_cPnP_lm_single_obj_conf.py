@@ -38,9 +38,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("VAR_pbr_OBJ_train",),
+    #TRAIN=("VAR_pbr_OBJ_train",),
     TEST=("lm_real_OBJ_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_yolov3_all.json",),
 )
 
 MODEL = dict(

@@ -8,9 +8,9 @@ lm_only_objects=("benchvise" "camera" "iron" "lamp" "phone")
 # lmo_variants=("lmo" "lmo_3r" "lmo_5r" "lmo_7r" "lmo_random_texture_all" "lmo_50k_mix")
 # lm_minus_variants=("lm" "lm-3r" "lm-5r" "lm-7r" "lm-random-texture-all" "lm-50k-mix")
 
-lm_variants=("lm_50k_mix")
-lmo_variants=("lmo_50k_mix")
-lm_minus_variants=("lm-50k-mix")
+lm_variants=("lm" "lm_random_texture_all")
+lmo_variants=("lmo" "lmo_random_texture_all")
+lm_minus_variants=("lm" "lm-random-texture-all")
 
 # Generate the single obj config files
 for variant in "${lm_variants[@]}"

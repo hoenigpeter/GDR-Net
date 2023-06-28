@@ -254,12 +254,12 @@ class GDRN(nn.Module):
 
             # Convert the array to 8-bit unsigned integer type
             combined_array = np.uint8(combined_array)
+            print(combined_array.shape)
+            # # Transpose the array to have shape (64, 64, 3) for RGB image format
+            # combined_array = np.transpose(combined_array.squeeze(), (1, 2, 0))
 
-            # Transpose the array to have shape (64, 64, 3) for RGB image format
-            combined_array = np.transpose(combined_array.squeeze(), (1, 2, 0))
-
-            # Create an RGB image from the combined array
-            dcm_image = cv2.cvtColor(combined_array, cv2.COLOR_RGB2BGR)
+            # # Create an RGB image from the combined array
+            # dcm_image = cv2.cvtColor(combined_array, cv2.COLOR_RGB2BGR)
 
             out_dict = {"rot": pred_ego_rot, "trans": pred_trans}
             if cfg.TEST.USE_PNP:
@@ -333,7 +333,8 @@ class GDRN(nn.Module):
             storage.put_scalars(**vis_dict)
 
             return out_dict, loss_dict
-        return out_dict, dcm_image
+        #return out_dict, dcm_image
+        return out_dict
 
     def gdrn_loss(
         self,

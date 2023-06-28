@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_random_texture_all_SO/_all"
+OUTPUT_DIR = "output/gdrn/40_epochs/itodd_SO/_all"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -38,9 +38,13 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lm_random_texture_all_pbr_13_train",),
-    TEST=("lm_13_test",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",),
+    #TRAIN=("itodd_pbr_train",),
+    TEST=("itodd_bop_test",),
+    # AP	AP50	AR	inf.time
+    # 60.657	89.625	66.2	0.024449
+    DET_FILES_TEST=(
+        "datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_x_640_itodd_pbr_itodd_bop_test.json",
+    ),
 )
 
 MODEL = dict(
@@ -72,8 +76,9 @@ MODEL = dict(
         TRANS_HEAD=dict(ENABLED=False),
     ),
 )
+
 VAL = dict(
-    DATASET_NAME="lm",
+    DATASET_NAME="itodd",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",

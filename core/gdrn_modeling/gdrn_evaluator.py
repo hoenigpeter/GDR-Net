@@ -564,7 +564,7 @@ def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False
                     continue
 
             with autocast(enabled=amp_test):
-                out_dict, dcm_image = model(
+                out_dict = model(
                     batch["roi_img"],
                     roi_classes=batch["roi_cls"],
                     roi_cams=batch["roi_cam"],
@@ -575,10 +575,10 @@ def gdrn_inference_on_dataset(cfg, model, data_loader, evaluator, amp_test=False
                     roi_extents=batch.get("roi_extent", None),
                 )
 
-            print(dcm_image.shape)
+            # print(dcm_image.shape)
 
-            cv2.imshow("xyz Image", dcm_image)
-            cv2.waitKey(5)
+            # cv2.imshow("xyz Image", dcm_image)
+            # cv2.waitKey(5)
 
             if torch.cuda.is_available():
                 torch.cuda.synchronize()

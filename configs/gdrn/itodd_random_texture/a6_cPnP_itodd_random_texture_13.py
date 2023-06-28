@@ -43,10 +43,10 @@ SOLVER = dict(
 
 DATASETS = dict(
     TRAIN=("itodd_random_texture_13_train_pbr",),
-    TEST=("itodd_13_bop_test",),
+    TEST=("itodd_bop_test",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_x_640_itodd_pbr_itodd_bop_test.json",),
     DET_TOPK_PER_13=100,
-    DET_THR=0.05,
+    DET_THR=0.1,
 )
 
 DATALOADER = dict(
@@ -93,7 +93,7 @@ VAL = dict(
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
-    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
+    N_TOP=-1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
     EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
