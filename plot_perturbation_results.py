@@ -89,7 +89,7 @@ if __name__ == "__main__":
     num_rows = 3
     num_cols = 5
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 8))
 
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
         row = i // num_cols
