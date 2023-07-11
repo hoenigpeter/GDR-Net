@@ -3,6 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import scienceplots
 import numpy as np
+import string
 
 plt.style.use('science')
 
@@ -72,7 +73,7 @@ if __name__ == "__main__":
             lmo_random_total_list.append(lmo_random_list)
             # writing the data into the file
 
-    for i, directory in zip(range(len(perturbation_types_print)), perturbation_types_print):
+    for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
             plt.figure(i + 1)
             #X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
@@ -80,17 +81,17 @@ if __name__ == "__main__":
             plt.plot(X, lmo_random_total_list[i], color='g', marker='s')
             plt.xlabel('Distortion Intensity', fontsize=14)
             plt.ylabel('ADD(S)',fontsize=14)
-            plt.title(directory, fontsize=16)
+            plt.title(letter + ") " + directory, fontsize=16)
             plt.xticks(X)
             plt.savefig(lmo_directory + "/" + f'plots/{directory}_graph.png', dpi=300)
             plt.close()
 
-    num_rows = 5
-    num_cols = 3
+    num_rows = 3
+    num_cols = 5
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 12))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 10))
 
-    for i, directory in enumerate(perturbation_types_print):
+    for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
         row = i // num_cols
         col = i % num_cols
 
@@ -98,7 +99,7 @@ if __name__ == "__main__":
         axes[row, col].plot(X, lmo_random_total_list[i], color='g', marker='s')
         axes[row, col].set_xlabel('Distortion Intensity', fontsize=14)
         axes[row, col].set_ylabel('ADD(S)', fontsize=14)
-        axes[row, col].set_title(directory, fontsize=16)
+        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
         axes[row, col].set_xticks(X)
 
     # Hide empty subplots
