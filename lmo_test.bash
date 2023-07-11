@@ -12,6 +12,10 @@ lmo_minus_variants=("lmo" "lmo-random-texture-all")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+# echo "Removing cache!"
+# command="rm -r .cache"
+# eval "$command"
+
 # Generate the single obj config files
 for lmo_variant in "${lmo_variants[@]}"
 do
@@ -104,6 +108,8 @@ done
     lmo_minus_variant="${lmo_minus_variants[i]}"
 
     command="cp ./output/gdrn/40_epochs/concat_csv_result_files.py ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/concat_csv_result_files.py"
+    eval "$command"
+    command="rm ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/csv_files/concatenated_result_files.csv"
     eval "$command"
     command="python ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/concat_csv_result_files.py"
     eval "$command"

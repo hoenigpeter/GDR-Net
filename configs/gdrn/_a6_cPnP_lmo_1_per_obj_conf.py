@@ -43,8 +43,9 @@ DATASETS = dict(
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",)
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
+        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
+        "datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
+        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/challenge2022-524061_lmo-test.json",),
 )
 
 MODEL = dict(
@@ -82,7 +83,7 @@ VAL = dict(
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
+    ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
