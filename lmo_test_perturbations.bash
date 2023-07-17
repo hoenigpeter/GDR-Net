@@ -17,14 +17,20 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # eval "$command"
 
 # Generate the single obj config files
-perturbations=("1" "2" "3" "4" "5")
+# perturbations=("1" "2" "3" "4" "5")
 # noise_types=("defocus_blur" "glass_blur" "motion_blur" "brightness" "contrast" "elastic_transform"
 # "pixelate" "jpeg_compression" "speckle_noise" "gaussian_blur" "spatter" "saturate")
 
-noise_types=("gaussian_noise" "shot_noise" "impulse_noise" "defocus_blur"
-"glass_blur" "motion_blur" "zoom_blur" "snow" "frost" "fog"
-"brightness" "contrast" "elastic_transform" "pixelate" "jpeg_compression"
-"speckle_noise" "gaussian_blur" "spatter" "saturate")
+# perturbations=("1" "2" "3" "4" "5")
+
+# noise_types=("gaussian_noise" "shot_noise" "impulse_noise" "defocus_blur"
+# "glass_blur" "motion_blur" "zoom_blur" "snow" "frost" "fog"
+# "brightness" "contrast" "elastic_transform" "pixelate" "jpeg_compression"
+# "speckle_noise" "gaussian_blur" "spatter" "saturate")
+
+perturbations=("1")
+
+noise_types=("gaussian_noise")
 
 for noise_type in "${noise_types[@]}"
 do
