@@ -462,7 +462,7 @@ class GDRN_DatasetFromList(Base_DatasetFromList):
 
         # load xyz =======================================================
         xyz_info = mmcv.load(inst_infos["xyz_path"])
-        print(xyz_info)
+        print(inst_infos["xyz_path"])
         print()
         x1, y1, x2, y2 = xyz_info["xyxy"]
         # float16 does not affect performance (classification/regresion)

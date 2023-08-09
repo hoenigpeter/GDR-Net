@@ -2,6 +2,10 @@ _base_ = ["../../_base_/gdrn_base.py"]
 
 OUTPUT_DIR = "output/gdrn/40_epochs/tless"
 INPUT = dict(
+    MIN_SIZE_TRAIN=540,
+    MAX_SIZE_TRAIN=720,
+    MIN_SIZE_TEST=540,
+    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
