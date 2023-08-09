@@ -1,7 +1,11 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tless"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture"
 INPUT = dict(
+    MIN_SIZE_TRAIN=540,
+    MAX_SIZE_TRAIN=720,
+    MIN_SIZE_TEST=540,
+    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
@@ -26,7 +30,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=40,
+    TOTAL_EPOCHS=10,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -38,7 +42,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("tless_train_pbr",),
+    TRAIN=("tless_random_texture_train_pbr",),
     TEST=("tless_bop_test_primesense",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
 )
