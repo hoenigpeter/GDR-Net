@@ -27,16 +27,20 @@ def read_data(filename):
 
 if __name__ == "__main__":
 
-    perturbation_types=["gaussian_noise","shot_noise","impulse_noise","defocus_blur",
-    "glass_blur","motion_blur","zoom_blur","snow","frost","fog",
-    "brightness","contrast","elastic_transform","pixelate","jpeg_compression",
-    "speckle_noise","gaussian_blur","spatter","saturate"]
+    perturbation_types=["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
 
-    perturbation_types_print=["Gaussian Noise", "Shot Noise", "Impulse Noise", "Defocus Blur",
- "Glass Blur", "Motion Blur", "Zoom Blur", "Snow", "Frost", "Fog",
- "Brightness", "Contrast", "Elastic Transform", "Pixelate", "JPEG Compression",
- "Speckle Noise", "Gaussian Blur", "Spatter", "Saturate"]
+    # perturbation_types=["gaussian_noise","shot_noise","impulse_noise","defocus_blur",
+    # "glass_blur","motion_blur","zoom_blur","snow","frost","fog",
+    # "brightness","contrast","elastic_transform","pixelate","jpeg_compression",
+    # "speckle_noise","gaussian_blur","spatter","saturate"]
 
+    perturbation_types_print=["Gaussian Noise", "Shot Noise", "Motion Blur", "Brightness", "Gaussian Blur"]
+
+#     perturbation_types_print=["Gaussian Noise", "Shot Noise", "Impulse Noise", "Defocus Blur",
+#  "Glass Blur", "Motion Blur", "Zoom Blur", "Snow", "Frost", "Fog",
+#  "Brightness", "Contrast", "Elastic Transform", "Pixelate", "JPEG Compression",
+#  "Speckle Noise", "Gaussian Blur", "Spatter", "Saturate"]
+    
     X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
     intensities = [*range(1,6,1)]
@@ -125,35 +129,74 @@ if __name__ == "__main__":
             plt.savefig(lmo_directory + "/" + f'plots/{directory}_graph.png', dpi=300)
             plt.close()
 
-    num_rows = 4
+    # num_rows = 4
+    # num_cols = 5
+
+    # fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
+
+    num_rows = 1
     num_cols = 5
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 3))
 
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
         row = i // num_cols
         col = i % num_cols
 
-        axes[row, col].plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='LMO Original')
+        if num_rows == 1:
+            axis = axes[col]  # Access the single row directly
+        else:
+            axis = axes[row, col]  # Access the 2D array of axes
+
+        axis.plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='LMO Original')
+
         #axes[row, col].plot(X, lmo_total_R_list[i], color='green', marker='o', label='LMO RE(5°)')
         #axes[row, col].plot(X, lmo_total_t_list[i], color='blue', marker='^', label='LMO TE(5cm)')
-        axes[row, col].plot(X, lmo_random_total_ADD_list[i], color='blue', marker='o', label='LMO Random')
+
+        axis.plot(X, lmo_random_total_ADD_list[i], color='blue', marker='o', label='LMO Random')
         #axes[row, col].plot(X, lmo_random_total_R_list[i], color='purple', marker='o', label='LMO Random RE(5°)')
         #axes[row, col].plot(X, lmo_random_total_t_list[i], color='cyan', marker='^', label='LMO Random TE(5cm)')
 
-        axes[row, col].set_xlabel('Severity', fontsize=14)
-        axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
-        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
-        axes[row, col].set_xticks(X)
+
+        if num_rows == 1:
+            #axis = axes[col]  # Access the single row directly
+            axes[col].set_xlabel('Severity', fontsize=14)
+            axes[0].set_ylabel('ADD(S)', fontsize=14)
+            axes[col].set_title(letter + ") " + directory, fontsize=16)
+            axes[col].set_xticks(X)
+        else:
+            axes[row, col].set_xlabel('Severity', fontsize=14)
+            axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+            axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+            axes[row, col].set_xticks(X)
+
+        # axes[row, col].set_xlabel('Severity', fontsize=14)
+        # axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+        # axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+        # axes[row, col].set_xticks(X)
+
+        # axis.set_xlabel('Severity', fontsize=14)
+        # axis.set_ylabel('ADD(S)', fontsize=14)
+        # axis.set_title(letter + ") " + directory, fontsize=16)
+        # axis.set_xticks(X)      
 
     # Hide empty subplots
     for i in range(len(perturbation_types_print), num_rows * num_cols):
-        row = i // num_cols
-        col = i % num_cols
+        if num_rows == 1:
+            col = i
+        else:
+            row = i // num_cols
+            col = i % num_cols
         fig.delaxes(axes[row, col])
 
-    handles, labels = axes[1,1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower right', fontsize=14)
-    plt.tight_layout() 
+    # Get legend handles and labels from a valid subplot
+    if num_rows == 1:
+        handles, labels = axes[1].get_legend_handles_labels()
+    else:
+        handles, labels = axes[0, 1].get_legend_handles_labels()
+
+    #fig.legend(handles, labels, loc='lower right', fontsize=14, bbox_to_anchor=(1.1, 1.05))
+    fig.legend(handles, labels, fontsize=14, bbox_to_anchor=(1.05, 0))
+    plt.tight_layout()
     plt.savefig(lmo_directory + "/" + 'plots/grid_graphs.png', dpi=300)
     plt.show()
