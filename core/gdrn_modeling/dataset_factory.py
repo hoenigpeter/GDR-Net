@@ -8,6 +8,9 @@ from detectron2.data import DatasetCatalog, MetadataCatalog
 #from .datasets import ycbv_pbr, ycbv_d2, ycbv_bop_test
 from .datasets import (
     tless_pbr,
+    tless_3r_pbr,
+    tless_5r_pbr,
+    tless_7r_pbr,
     tless_random_texture_pbr,
     tless_d2,
     tless_bop_test,
@@ -41,6 +44,9 @@ __all__ = ["register_dataset", "register_datasets", "register_datasets_in_cfg", 
 #_DSET_MOD_NAMES = ["ycbv_pbr", "ycbv_d2", "ycbv_bop_test"]
 _DSET_MOD_NAMES = [
     "tless_pbr",
+    "tless_3r_pbr",
+    "tless_5r_pbr",
+    "tless_7r_pbr",
     "tless_random_texture_pbr",
     "tless_d2",
     "tless_bop_test",
