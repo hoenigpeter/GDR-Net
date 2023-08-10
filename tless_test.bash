@@ -13,8 +13,11 @@ for tless_object in "${tless_objects[@]}"; do
     echo "$tless_object"
 done
 
-tless_variants=("tless" "tless_random_texture")
-tless_minus_variants=("tless" "tless-random-texture")
+# tless_variants=("tless" "tless_random_texture")
+# tless_minus_variants=("tless" "tless-random-texture")
+
+tless_variants=("tless_random_texture")
+tless_minus_variants=("tless-random-texture")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -44,17 +47,17 @@ do
         sed -e "s/VAR/${variant}/g" "$INPUT_FILE" > "$OUTPUT_FILE"
 done
 
-# for variant in "${tless_variants[@]}"
-# do
-#     for tless_object in "${tless_objects[@]}"
-#     do
-#     # Replace the "ape" string with the current model string in the command
-#     command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${variant[@]}/a6_cPnP_${variant[@]}_${tless_object}.py 0 output/gdrn/40_epochs/${variant[@]}_SO/${tless_object}/model_final.pth"
+for variant in "${tless_variants[@]}"
+do
+    for tless_object in "${tless_objects[@]}"
+    do
+    # Replace the "ape" string with the current model string in the command
+    command="./core/gdrn_modeling/test_gdrn.sh configs/gdrn/${variant[@]}/a6_cPnP_${variant[@]}_${tless_object}.py 0 output/gdrn/40_epochs/${variant[@]}_SO/${tless_object}/model_final.pth"
     
-#     # Execute the command
-#     eval "$command"
-#     done
-# done
+    # Execute the command
+    eval "$command"
+    done
+done
 
 for i in "${!tless_variants[@]}"
 do

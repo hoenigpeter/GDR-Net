@@ -44,7 +44,8 @@ SOLVER = dict(
 DATASETS = dict(
     TRAIN=("tless_train_pbr",),
     TEST=("tless_bop_test_primesense",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
 )
 
 MODEL = dict(
@@ -81,8 +82,8 @@ VAL = dict(
     DATASET_NAME="tless",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
-    #RENDERER_TYPE="cpp",  # cpp, python, egl
+    ERROR_TYPES="mspd,mssd,vsd",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
