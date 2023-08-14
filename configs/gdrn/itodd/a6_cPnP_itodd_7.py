@@ -42,11 +42,9 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("itodd_7_train_pbr",),
+    #TRAIN=("itodd_7_train_pbr",),
     TEST=("itodd_bop_test",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_x_640_itodd_pbr_itodd_bop_test.json",),
-    DET_TOPK_PER_7=100,
-    DET_THR=0.1,
+    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/gdrnppdet-pbr_itodd-test.json",),
 )
 
 DATALOADER = dict(

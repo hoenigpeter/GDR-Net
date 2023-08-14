@@ -40,11 +40,7 @@ SOLVER = dict(
 DATASETS = dict(
     #TRAIN=("itodd_pbr_train",),
     TEST=("itodd_bop_test",),
-    # AP	AP50	AR	inf.time
-    # 60.657	89.625	66.2	0.024449
-    DET_FILES_TEST=(
-        "datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_x_640_itodd_pbr_itodd_bop_test.json",
-    ),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/gdrnppdet-pbr_itodd-test.json",),
 )
 
 MODEL = dict(
