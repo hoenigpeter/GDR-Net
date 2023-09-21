@@ -42,8 +42,8 @@ DATASETS = dict(
     TEST=("lmo_glue_bop_test",),
     DET_FILES_TEST=(
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/gdrnppdet_lmo-test.json",),
+        "datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
+        # "datasets/BOP_DATASETS/lmo/test/test_bboxes/gdrnppdet_lmo-test.json",),
 )
 
 MODEL = dict(

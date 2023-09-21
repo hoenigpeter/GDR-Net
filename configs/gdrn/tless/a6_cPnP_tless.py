@@ -42,7 +42,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("tless_train_pbr",),
+    #TRAIN=("tless_train_pbr",),
     TEST=("tless_bop_test_primesense",),
     #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
     DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),

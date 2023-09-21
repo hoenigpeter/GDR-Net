@@ -18,29 +18,11 @@ def read_data(filename):
             data[obj] = dict(zip(header[1:], values))
     return header, data
 
-#directories =  ["saturate"]
-
-# directories=["gaussian_noise","shot_noise","impulse_noise","defocus_blur"
-# "glass_blur","motion_blur","zoom_blur","snow","frost","fog"
-# "brightness","contrast","elastic_transform","pixelate","jpeg_compression"
-# "speckle_noise","gaussian_blur","spatter","saturate"]
-
 if __name__ == "__main__":
 
     perturbation_types=["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
-
-    # perturbation_types=["gaussian_noise","shot_noise","impulse_noise","defocus_blur",
-    # "glass_blur","motion_blur","zoom_blur","snow","frost","fog",
-    # "brightness","contrast","elastic_transform","pixelate","jpeg_compression",
-    # "speckle_noise","gaussian_blur","spatter","saturate"]
-
     perturbation_types_print=["Gaussian Noise", "Shot Noise", "Motion Blur", "Brightness", "Gaussian Blur"]
 
-#     perturbation_types_print=["Gaussian Noise", "Shot Noise", "Impulse Noise", "Defocus Blur",
-#  "Glass Blur", "Motion Blur", "Zoom Blur", "Snow", "Frost", "Fog",
-#  "Brightness", "Contrast", "Elastic Transform", "Pixelate", "JPEG Compression",
-#  "Speckle Noise", "Gaussian Blur", "Spatter", "Saturate"]
-    
     X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
     intensities = [*range(1,6,1)]
@@ -48,13 +30,11 @@ if __name__ == "__main__":
     lmo_total_ADD_list = []
     lmo_random_total_ADD_list = []
 
-    lmo_total_R_list = []
-    lmo_random_total_R_list = []
+    tless_total_ADD_list = []
+    tless_random_total_ADD_list = []
 
-    lmo_total_t_list = []
-    lmo_random_total_t_list = []
-
-    lmo_directory = "./datasets/BOP_DATASETS/lmo/test"
+    lmo_directory = "./datasets/BOP_DATASETS/lmo/perturbations"
+    tless_directory = "./datasets/BOP_DATASETS/tless/perturbations"
 
     with open(os.path.join(lmo_directory, 'lmo_perturbations.csv'), 'w', newline ='') as lmo_ADD_file:
         # read the first file
@@ -63,140 +43,106 @@ if __name__ == "__main__":
             print(directory)
             lmo_ADD_list = []
             lmo_ADD_list.append(48.98)
-            lmo_R_list = []
-            lmo_R_list.append(51.37)
-            lmo_t_list = []
-            lmo_t_list.append(85.28)
+
             for intensity in intensities:
                 filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
                 lmo_ADD_list.append(data['Avg(8)']['ad_0.100'])  
-                lmo_R_list.append(data['Avg(8)']['reS_5'])  
-                lmo_t_list.append(data['Avg(8)']['teS_5'])  
-            # writer = csv.writer(lmo_ADD_file)
-            # writer.writerow(lmo_ADD_list)
+
             lmo_total_ADD_list.append(lmo_ADD_list)
-            lmo_total_R_list.append(lmo_R_list)
-            lmo_total_t_list.append(lmo_t_list)
 
     with open(os.path.join(lmo_directory, 'lmo_random_perturbations.csv'), 'w', newline ='') as lmo_random_file:
         for perturbation_type in perturbation_types:
             directory = os.path.join(lmo_directory, perturbation_type)
             lmo_random_ADD_list = []
             lmo_random_ADD_list.append(39.07)
-            lmo_random_R_list = []
-            lmo_random_R_list.append(44.99)
-            lmo_random_t_list = []
-            lmo_random_t_list.append(76.15)
+
             for intensity in intensities:
                 filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
                 lmo_random_ADD_list.append(data['Avg(8)']['ad_0.100'])   
-                lmo_random_R_list.append(data['Avg(8)']['reS_5'])   
-                lmo_random_t_list.append(data['Avg(8)']['teS_5'])   
-            # writer = csv.writer(lmo_random_file)
-            # writer.writerow(lmo_random_list)
+
             lmo_random_total_ADD_list.append(lmo_random_ADD_list)
-            lmo_random_total_R_list.append(lmo_random_R_list)
-            lmo_random_total_t_list.append(lmo_random_t_list)
-            # writing the data into the file
 
-    for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
-            plt.figure(i + 1)
-            #X = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    with open(os.path.join(tless_directory, 'tless_perturbations.csv'), 'w', newline ='') as tless_ADD_file:
+        # read the first file
+        for perturbation_type in perturbation_types:
+            directory = os.path.join(tless_directory, perturbation_type)
+            print(directory)
+            tless_ADD_list = []
+            tless_ADD_list.append(68.86)
 
-            # plt.plot(X, lmo_total_ADD_list[i], color='g', marker='s')
-            # plt.plot(X, lmo_total_R_list[i], color='g', marker='s')
-            # plt.plot(X, lmo_total_t_list[i], color='g', marker='s')
+            for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
+                filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
+                header, data = read_data(filepath)
+                tless_ADD_list.append(data['Avg(30)']['ad_0.100'])  
 
-            # plt.plot(X, lmo_random_total_ADD_list[i], color='b', marker='o')
-            # plt.plot(X, lmo_random_total_R_list[i], color='b', marker='o')
-            # plt.plot(X, lmo_random_total_t_list[i], color='b', marker='o')
+            tless_total_ADD_list.append(tless_ADD_list)
 
-            plt.plot(X, lmo_total_ADD_list[i], color='red', marker='s', label='LMO ADD(S)')
-            plt.plot(X, lmo_total_R_list[i], color='green', marker='o', label='LMO RE(5°)')
-            plt.plot(X, lmo_total_t_list[i], color='blue', marker='^', label='LMO TE(5cm)')
+    with open(os.path.join(tless_directory, 'tless_random_perturbations.csv'), 'w', newline ='') as lmo_random_file:
+        for perturbation_type in perturbation_types:
+            directory = os.path.join(tless_directory, perturbation_type)
+            lmo_random_ADD_list = []
+            lmo_random_ADD_list.append(71.71)
 
-            plt.plot(X, lmo_random_total_ADD_list[i], color='orange', marker='s', label='LMO Random ADD(S)')
-            plt.plot(X, lmo_random_total_R_list[i], color='purple', marker='o', label='LMO Random RE(5°)')
-            plt.plot(X, lmo_random_total_t_list[i], color='cyan', marker='^', label='LMO Random TE(5cm)')
+            for intensity in intensities:
+                filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
+                header, data = read_data(filepath)
+                lmo_random_ADD_list.append(data['Avg(30)']['ad_0.100'])    
 
-            plt.xlabel('Severity', fontsize=14)
-            plt.ylabel('Error',fontsize=14)
-            plt.title(letter + ") " + directory, fontsize=16)
-            plt.xticks(X)
-            plt.legend(bbox_to_anchor=(1.1, 1.05))
-            plt.savefig(lmo_directory + "/" + f'plots/{directory}_graph.png', dpi=300)
-            plt.close()
+            tless_random_total_ADD_list.append(lmo_random_ADD_list)
 
-    # num_rows = 4
-    # num_cols = 5
-
-    # fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
-
-    num_rows = 1
+    num_rows = 2
     num_cols = 5
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 3))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 6))
 
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
-        row = i // num_cols
+        row = 0
         col = i % num_cols
 
-        if num_rows == 1:
-            axis = axes[col]  # Access the single row directly
-        else:
-            axis = axes[row, col]  # Access the 2D array of axes
+        axis = axes[row, col]  # Access the 2D array of axes
 
         axis.plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='LMO Original')
+        axis.plot(X, lmo_random_total_ADD_list[i], color='red', marker='o', label='LMO Random')
 
-        #axes[row, col].plot(X, lmo_total_R_list[i], color='green', marker='o', label='LMO RE(5°)')
-        #axes[row, col].plot(X, lmo_total_t_list[i], color='blue', marker='^', label='LMO TE(5cm)')
+        axes[row, col].set_xlabel('Severity', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+        axes[row, col].set_xticks(X)
+    
+    for letter, (i, directory) in zip(string.ascii_lowercase[num_cols:], enumerate(perturbation_types_print)):
+        row = 1
+        col = i % num_cols
 
-        axis.plot(X, lmo_random_total_ADD_list[i], color='blue', marker='o', label='LMO Random')
-        #axes[row, col].plot(X, lmo_random_total_R_list[i], color='purple', marker='o', label='LMO Random RE(5°)')
-        #axes[row, col].plot(X, lmo_random_total_t_list[i], color='cyan', marker='^', label='LMO Random TE(5cm)')
+        axis = axes[row, col]  # Access the 2D array of axes
 
+        axis.plot(X, tless_total_ADD_list[i], color='purple', marker='s', label='TLESS Original')
+        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Random')
 
-        if num_rows == 1:
-            #axis = axes[col]  # Access the single row directly
-            axes[col].set_xlabel('Severity', fontsize=14)
-            axes[0].set_ylabel('ADD(S)', fontsize=14)
-            axes[col].set_title(letter + ") " + directory, fontsize=16)
-            axes[col].set_xticks(X)
-        else:
-            axes[row, col].set_xlabel('Severity', fontsize=14)
-            axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
-            axes[row, col].set_title(letter + ") " + directory, fontsize=16)
-            axes[row, col].set_xticks(X)
+        axes[row, col].set_xlabel('Severity', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+        axes[row, col].set_xticks(X)
 
-        # axes[row, col].set_xlabel('Severity', fontsize=14)
-        # axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
-        # axes[row, col].set_title(letter + ") " + directory, fontsize=16)
-        # axes[row, col].set_xticks(X)
+    # # Get legend handles and labels from a valid subplot
+    handles, labels = axes[0, 1].get_legend_handles_labels()
 
-        # axis.set_xlabel('Severity', fontsize=14)
-        # axis.set_ylabel('ADD(S)', fontsize=14)
-        # axis.set_title(letter + ") " + directory, fontsize=16)
-        # axis.set_xticks(X)      
+    # Get handles and labels from axes[0, 1]
+    handles1, labels1 = axes[0, 1].get_legend_handles_labels()
 
-    # Hide empty subplots
-    for i in range(len(perturbation_types_print), num_rows * num_cols):
-        if num_rows == 1:
-            col = i
-        else:
-            row = i // num_cols
-            col = i % num_cols
-        fig.delaxes(axes[row, col])
+    # Get handles and labels from axes[1, 1]
+    handles2, labels2 = axes[1, 1].get_legend_handles_labels()
 
-    # Get legend handles and labels from a valid subplot
-    if num_rows == 1:
-        handles, labels = axes[1].get_legend_handles_labels()
-    else:
-        handles, labels = axes[0, 1].get_legend_handles_labels()
+    # Combine the handles and labels
+    all_handles = handles1 + handles2
+    all_labels = labels1 + labels2
 
-    #fig.legend(handles, labels, loc='lower right', fontsize=14, bbox_to_anchor=(1.1, 1.05))
-    fig.legend(handles, labels, fontsize=14, bbox_to_anchor=(1.05, 0))
-    plt.tight_layout()
-    plt.savefig(lmo_directory + "/" + 'plots/grid_graphs.png', dpi=300)
+    # #fig.legend(handles, labels, loc='lower right', fontsize=14, bbox_to_anchor=(1.1, 1.05))
+    # fig.legend(handles, labels, fontsize=14, bbox_to_anchor=(1.15, 0))
+    fig.legend(all_handles, all_labels, fontsize=14, loc='upper center', bbox_to_anchor=(0.5, 0),
+          fancybox=True, shadow=True, ncol=4)
+    fig.tight_layout()
+    fig.savefig('image_output.png', dpi=300, format='png', bbox_inches='tight')
+    #plt.savefig(lmo_directory + "/" + 'plots/grid_graphs.png', dpi=300)
     plt.show()
