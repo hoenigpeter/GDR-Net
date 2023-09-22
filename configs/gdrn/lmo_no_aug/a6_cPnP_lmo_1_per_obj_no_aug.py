@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_random_texture_all_SO/duck"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_no_aug_SO/_all"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -24,32 +24,9 @@ INPUT = dict(
     ),
 )
 
-# INPUT = dict(
-#     DZI_PAD_SCALE=1.5,
-#     TRUNCATE_FG=True,
-#     CHANGE_BG_PROB=0.5,
-#     COLOR_AUG_PROB=0.8,
-#     COLOR_AUG_TYPE="code",
-#     COLOR_AUG_CODE=(
-#         "Sequential(["
-#         # Sometimes(0.5, PerspectiveTransform(0.05)),
-#         # Sometimes(0.5, CropAndPad(percent=(-0.05, 0.1))),
-#         # Sometimes(0.5, Affine(scale=(1.0, 1.2))),
-#         "Sometimes(0.5, CoarseDropout( p=0.2, size_percent=0.05) ),"
-#         "Sometimes(0.5, GaussianBlur(1.2*np.random.rand())),"
-#         "Sometimes(0.5, Add((-25, 25), per_channel=0.3)),"
-#         "Sometimes(0.3, Invert(0.2, per_channel=True)),"
-#         "Sometimes(0.5, Multiply((0.6, 1.4), per_channel=0.5)),"
-#         "Sometimes(0.5, Multiply((0.6, 1.4))),"
-#         "Sometimes(0.5, LinearContrast((0.5, 2.2), per_channel=0.3))"
-#         "], random_order = False)"
-#         # aae
-#     ),
-# )
-
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=80,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -61,8 +38,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lmo_random_texture_all_pbr_duck_train",),
-    TEST=("lmo_duck_bop_test",),
+    TRAIN=("lmo_pbr_train",),
+    TEST=("lmo_bop_test",),
+    # AP	AP50	AR	inf.time
+    # 60.657	89.625	66.2	0.024449
     DET_FILES_TEST=(
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
         "datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
@@ -104,12 +83,12 @@ VAL = dict(
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="ad",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
     N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
-    EVAL_CACHED=False,  # if the predicted poses have been saved
+    EVAL_CACHED=True,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall

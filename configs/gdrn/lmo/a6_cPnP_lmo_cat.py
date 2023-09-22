@@ -4,25 +4,48 @@ OUTPUT_DIR = "output/gdrn/40_epochs/lmo_SO/cat"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
-    CHANGE_BG_PROB=0.5,
-    COLOR_AUG_PROB=0.8,
+    CHANGE_BG_PROB=0.0,
+    COLOR_AUG_PROB=0.0,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
         "Sequential(["
         # Sometimes(0.5, PerspectiveTransform(0.05)),
         # Sometimes(0.5, CropAndPad(percent=(-0.05, 0.1))),
         # Sometimes(0.5, Affine(scale=(1.0, 1.2))),
-        "Sometimes(0.5, CoarseDropout( p=0.2, size_percent=0.05) ),"
-        "Sometimes(0.5, GaussianBlur(1.2*np.random.rand())),"
-        "Sometimes(0.5, Add((-25, 25), per_channel=0.3)),"
-        "Sometimes(0.3, Invert(0.2, per_channel=True)),"
-        "Sometimes(0.5, Multiply((0.6, 1.4), per_channel=0.5)),"
-        "Sometimes(0.5, Multiply((0.6, 1.4))),"
-        "Sometimes(0.5, LinearContrast((0.5, 2.2), per_channel=0.3))"
+        # "Sometimes(0.5, CoarseDropout( p=0.2, size_percent=0.05) ),"
+        # "Sometimes(0.5, GaussianBlur(1.2*np.random.rand())),"
+        # "Sometimes(0.5, Add((-25, 25), per_channel=0.3)),"
+        # "Sometimes(0.3, Invert(0.2, per_channel=True)),"
+        # "Sometimes(0.5, Multiply((0.6, 1.4), per_channel=0.5)),"
+        # "Sometimes(0.5, Multiply((0.6, 1.4))),"
+        # "Sometimes(0.5, LinearContrast((0.5, 2.2), per_channel=0.3))"
         "], random_order = False)"
         # aae
     ),
 )
+
+# INPUT = dict(
+#     DZI_PAD_SCALE=1.5,
+#     TRUNCATE_FG=True,
+#     CHANGE_BG_PROB=0.5,
+#     COLOR_AUG_PROB=0.8,
+#     COLOR_AUG_TYPE="code",
+#     COLOR_AUG_CODE=(
+#         "Sequential(["
+#         # Sometimes(0.5, PerspectiveTransform(0.05)),
+#         # Sometimes(0.5, CropAndPad(percent=(-0.05, 0.1))),
+#         # Sometimes(0.5, Affine(scale=(1.0, 1.2))),
+#         "Sometimes(0.5, CoarseDropout( p=0.2, size_percent=0.05) ),"
+#         "Sometimes(0.5, GaussianBlur(1.2*np.random.rand())),"
+#         "Sometimes(0.5, Add((-25, 25), per_channel=0.3)),"
+#         "Sometimes(0.3, Invert(0.2, per_channel=True)),"
+#         "Sometimes(0.5, Multiply((0.6, 1.4), per_channel=0.5)),"
+#         "Sometimes(0.5, Multiply((0.6, 1.4))),"
+#         "Sometimes(0.5, LinearContrast((0.5, 2.2), per_channel=0.3))"
+#         "], random_order = False)"
+#         # aae
+#     ),
+# )
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
