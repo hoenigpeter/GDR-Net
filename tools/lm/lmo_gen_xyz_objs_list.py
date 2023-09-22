@@ -139,7 +139,7 @@ class XyzGen(object):
 
                         pose = np.hstack([R, t.reshape(3, 1)])
 
-                        save_path = osp.join(self.xyz_root, scene, f"{int_im_id:06d}_{anno_i:06d}-xyz.jpg")
+                        save_path = osp.join(self.xyz_root, scene, f"{int_im_id:06d}_{anno_i:06d}-xyz.pkl")
                         if osp.exists(save_path) and osp.getsize(save_path) > 0:
                             continue
 
