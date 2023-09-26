@@ -17,7 +17,7 @@ bop_root = osp.join(data_root, "BOP_DATASETS/")
 # ---------------------------------------------------------------- #
 # TLESS DATASET
 # ---------------------------------------------------------------- #
-dataset_root = osp.join(bop_root, "tless_3r")
+dataset_root = osp.join(bop_root, "tless_7r")
 train_real_dir = osp.join(dataset_root, "train_primesense")
 train_render_dir = osp.join(dataset_root, "train_render_reconst")
 test_dir = osp.join(dataset_root, "test_primesense")
