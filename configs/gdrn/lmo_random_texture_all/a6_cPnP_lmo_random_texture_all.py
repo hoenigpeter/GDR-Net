@@ -38,12 +38,12 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lmo_random_texture_all_pbr_train",),
+    TRAIN=("lmo_random_texture_all_pbr_train",),
     TEST=("lmo_bop_test",),
     DET_FILES_TEST=(
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",),
+        "datasets/BOP_DATASETS/lmo/test/test_bboxes/gdrnppdet_lmo-test.json",),
 )
 
 MODEL = dict(

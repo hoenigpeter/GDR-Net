@@ -38,7 +38,7 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("VAR_pbr_train",),
+    #TRAIN=("VAR_pbr_train",),
     TEST=("lmo_bop_test",),
     # AP	AP50	AR	inf.time
     # 60.657	89.625	66.2	0.024449
@@ -83,7 +83,7 @@ VAL = dict(
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="mspd,mssd,vsd,ad",
+    ERROR_TYPES="ad",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

@@ -82,11 +82,21 @@ p = {
             "type": "adi",
             "correct_th": [[th] for th in [0.02, 0.05, 0.1]],
         },  # diameter
+        # {
+        #     "n_top": -1,
+        #     "type": "ad",  # adi for symmetric objects, add for normal objects
+        #     "correct_th": [[th] for th in [0.02, 0.05, 0.1]],  # diameter
+        # },
         {
             "n_top": -1,
             "type": "ad",  # adi for symmetric objects, add for normal objects
-            "correct_th": [[th] for th in [0.02, 0.05, 0.1]],  # diameter
+            "correct_th": [[10]],  # diameter
         },
+        # {
+        #     "n_top": -1,
+        #     "type": "ad",  # adi for symmetric objects, add for normal objects
+        #     "correct_th": [[10]],  # diameter
+        # },
         ##################
         # ADD(-S) with absolute threshold 2cm, for YCB-Video
         {"n_top": -1, "type": "ABSadd", "correct_th": [[th] for th in [2]]},

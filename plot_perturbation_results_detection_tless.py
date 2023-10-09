@@ -4,19 +4,14 @@ import matplotlib.pyplot as plt
 import scienceplots
 import numpy as np
 import string
+import json
 
 plt.style.use('science')
 
 def read_data(filename):
     with open(filename, 'r') as f:
-        header = f.readline().strip().split()
-        data = {}
-        for line in f:
-            cols = line.strip().split()
-            obj = cols[0]
-            values = [float(x) for x in cols[1:]]
-            data[obj] = dict(zip(header[1:], values))
-    return header, data
+        data = json.load(f)
+    return data
 
 if __name__ == "__main__":
 
@@ -36,26 +31,25 @@ if __name__ == "__main__":
         directory = os.path.join(tless_directory, perturbation_type)
         print(directory)
         tless_ADD_list = []
-        #tless_ADD_list.append(68.86)
-        tless_ADD_list.append(84.84)
+        tless_ADD_list.append(84.39)
 
         for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
-            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-            header, data = read_data(filepath)
-            tless_ADD_list.append(data['Avg(30)']['ad_10'])  
+            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/map_result_tless.json')
+            print(filepath)
+            data = read_data(filepath)
+            tless_ADD_list.append(data['bbox']['AP'])  
 
-            tless_total_ADD_list.append(tless_ADD_list)
+        tless_total_ADD_list.append(tless_ADD_list)
 
     for perturbation_type in perturbation_types:
         directory = os.path.join(tless_directory, perturbation_type)
         tless_random_ADD_list = []
-        #lmo_random_ADD_list.append(71.71)
-        tless_random_ADD_list.append(88.87)
+        tless_random_ADD_list.append(82.25)
 
         for intensity in intensities:
-            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-            header, data = read_data(filepath)
-            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])    
+            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/map_result_tless_random_texture.json')
+            data = read_data(filepath)
+            tless_random_ADD_list.append(data['bbox']['AP'])    
 
         tless_random_total_ADD_list.append(tless_random_ADD_list)
 

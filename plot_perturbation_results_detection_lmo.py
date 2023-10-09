@@ -4,19 +4,14 @@ import matplotlib.pyplot as plt
 import scienceplots
 import numpy as np
 import string
+import json
 
 plt.style.use('science')
 
 def read_data(filename):
     with open(filename, 'r') as f:
-        header = f.readline().strip().split()
-        data = {}
-        for line in f:
-            cols = line.strip().split()
-            obj = cols[0]
-            values = [float(x) for x in cols[1:]]
-            data[obj] = dict(zip(header[1:], values))
-    return header, data
+        data = json.load(f)
+    return data
 
 if __name__ == "__main__":
 
@@ -27,52 +22,51 @@ if __name__ == "__main__":
 
     intensities = [*range(1,6,1)]
 
-    tless_total_ADD_list = []
-    tless_random_total_ADD_list = []
+    lmo_total_ADD_list = []
+    lmo_random_total_ADD_list = []
 
-    tless_directory = "./datasets/BOP_DATASETS/tless/perturbations_add_0.1"
+    lmo_directory = "./datasets/BOP_DATASETS/lmo/perturbations_add_0.1"
 
     for perturbation_type in perturbation_types:
-        directory = os.path.join(tless_directory, perturbation_type)
+        directory = os.path.join(lmo_directory, perturbation_type)
         print(directory)
-        tless_ADD_list = []
-        #tless_ADD_list.append(68.86)
-        tless_ADD_list.append(84.84)
+        lmo_ADD_list = []
+        lmo_ADD_list.append(65.08)
 
-        for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
-            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-            header, data = read_data(filepath)
-            tless_ADD_list.append(data['Avg(30)']['ad_10'])  
+        for intensity in intensities:                                                                    #a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/map_result_lmo.json')
+            print(filepath)
+            data = read_data(filepath)
+            lmo_ADD_list.append(data['bbox']['AP'])  
 
-            tless_total_ADD_list.append(tless_ADD_list)
+        lmo_total_ADD_list.append(lmo_ADD_list)
 
     for perturbation_type in perturbation_types:
-        directory = os.path.join(tless_directory, perturbation_type)
-        tless_random_ADD_list = []
-        #lmo_random_ADD_list.append(71.71)
-        tless_random_ADD_list.append(88.87)
+        directory = os.path.join(lmo_directory, perturbation_type)
+        lmo_random_ADD_list = []
+        lmo_random_ADD_list.append(59.33)
 
         for intensity in intensities:
-            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-            header, data = read_data(filepath)
-            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])    
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/map_result_lmo_random_texture_all.json')
+            data = read_data(filepath)
+            lmo_random_ADD_list.append(data['bbox']['AP'])    
 
-        tless_random_total_ADD_list.append(tless_random_ADD_list)
+        lmo_random_total_ADD_list.append(lmo_random_ADD_list)
 
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types)):
             plt.figure(i + 1)
             #X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
-            plt.plot(X, tless_total_ADD_list[i], color='red', marker='s', label='TLESS ADD(S)')
+            plt.plot(X, lmo_total_ADD_list[i], color='red', marker='s', label='lmo ADD(S)')
 
-            plt.plot(X, tless_random_total_ADD_list[i], color='orange', marker='s', label='TLESS Random ADD(S)')
+            plt.plot(X, lmo_random_total_ADD_list[i], color='orange', marker='s', label='lmo Random ADD(S)')
 
             plt.xlabel('Severity', fontsize=14)
             plt.ylabel('Error',fontsize=14)
             plt.title(letter + ") " + directory, fontsize=16)
             plt.xticks(X)
             plt.legend(bbox_to_anchor=(1.1, 1.05))
-            plt.savefig(tless_directory + "/" + f'plots/{directory}_graph.png', dpi=300)
+            plt.savefig(lmo_directory + "/" + f'plots/{directory}_graph.png', dpi=300)
             plt.close()
 
     num_rows = 1
@@ -89,8 +83,8 @@ if __name__ == "__main__":
         else:
             axis = axes[row, col]  # Access the 2D array of axes
 
-        axis.plot(X, tless_total_ADD_list[i], color='green', marker='s', label='TLESS Original')
-        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Random')
+        axis.plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='lmo Original')
+        axis.plot(X, lmo_random_total_ADD_list[i], color='blue', marker='o', label='lmo Random')
 
         if num_rows == 1:
             axes[col].set_xlabel('Severity', fontsize=14)
@@ -121,5 +115,5 @@ if __name__ == "__main__":
     #fig.legend(handles, labels, loc='lower right', fontsize=14, bbox_to_anchor=(1.1, 1.05))
     fig.legend(handles, labels, fontsize=14, bbox_to_anchor=(1.05, 0))
     plt.tight_layout()
-    plt.savefig(tless_directory + "/" + 'plots/grid_graphs.png', dpi=300)
+    plt.savefig(lmo_directory + "/" + 'plots/grid_graphs.png', dpi=300)
     plt.show()

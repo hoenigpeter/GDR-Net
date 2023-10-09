@@ -34,21 +34,20 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # "brightness" "contrast" "elastic_transform" "pixelate" "jpeg_compression"
 # "speckle_noise" "gaussian_blur" "spatter" "saturate")
 
-perturbations=("1" "2" "3" "4" "5")
+#perturbations=("1" "2" "3" "4" "5")
+perturbations=("2")
 #["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
-noise_types=("gaussian_blur")
+#noise_types=("gaussian_blur")
 #noise_types=("gaussian_noise" "shot_noise" "motion_blur" "brightness" "gaussian_blur")
+noise_types=("gaussian_noise")
 
 for noise_type in "${noise_types[@]}"
 do
     for perturbation in "${perturbations[@]}"
     do
-        for tless_variant in "${tless_variants[@]}"
-        do
-            command="mv ./datasets/BOP_DATASETS/tless/perturbations/${noise_type[@]}/test_primesense_${noise_type[@]}_${perturbation[@]} ./datasets/BOP_DATASETS/tless/test_primesense"
-            eval "$command"
-            
-        done   
+        command="mv ./datasets/BOP_DATASETS/tless/perturbations/${noise_type[@]}/test_primesense_${noise_type[@]}_${perturbation[@]} ./datasets/BOP_DATASETS/tless/test_primesense"
+        eval "$command"
+
         for tless_variant in "${tless_variants[@]}"
         do
             for tless_object in "${tless_objects[@]}"

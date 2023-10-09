@@ -47,7 +47,7 @@ if __name__ == "__main__":
             for intensity in intensities:
                 filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
-                lmo_ADD_list.append(data['Avg(8)']['ad_0.100'])  
+                lmo_ADD_list.append(data['Avg(8)']['ad_10'])  
 
             lmo_total_ADD_list.append(lmo_ADD_list)
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
             for intensity in intensities:
                 filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
-                lmo_random_ADD_list.append(data['Avg(8)']['ad_0.100'])   
+                lmo_random_ADD_list.append(data['Avg(8)']['ad_10'])   
 
             lmo_random_total_ADD_list.append(lmo_random_ADD_list)
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
             for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
                 filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
-                tless_ADD_list.append(data['Avg(30)']['ad_0.100'])  
+                tless_ADD_list.append(data['Avg(30)']['ad_10'])  
 
             tless_total_ADD_list.append(tless_ADD_list)
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
             for intensity in intensities:
                 filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
                 header, data = read_data(filepath)
-                lmo_random_ADD_list.append(data['Avg(30)']['ad_0.100'])    
+                lmo_random_ADD_list.append(data['Avg(30)']['ad_10'])    
 
             tless_random_total_ADD_list.append(lmo_random_ADD_list)
 

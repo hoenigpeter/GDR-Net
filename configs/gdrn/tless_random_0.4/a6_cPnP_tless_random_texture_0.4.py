@@ -1,7 +1,13 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_SO/glue"
+aug_percentage = 0.4
+
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture_0.4"
 INPUT = dict(
+    MIN_SIZE_TRAIN=540,
+    MAX_SIZE_TRAIN=720,
+    MIN_SIZE_TEST=540,
+    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
@@ -12,13 +18,13 @@ INPUT = dict(
         # Sometimes(0.5, PerspectiveTransform(0.05)),
         # Sometimes(0.5, CropAndPad(percent=(-0.05, 0.1))),
         # Sometimes(0.5, Affine(scale=(1.0, 1.2))),
-        "Sometimes(0.5, CoarseDropout( p=0.2, size_percent=0.05) ),"
-        "Sometimes(0.5, GaussianBlur(1.2*np.random.rand())),"
-        "Sometimes(0.5, Add((-25, 25), per_channel=0.3)),"
-        "Sometimes(0.3, Invert(0.2, per_channel=True)),"
-        "Sometimes(0.5, Multiply((0.6, 1.4), per_channel=0.5)),"
-        "Sometimes(0.5, Multiply((0.6, 1.4))),"
-        "Sometimes(0.5, LinearContrast((0.5, 2.2), per_channel=0.3))"
+        f"Sometimes({0.5 * aug_percentage}, CoarseDropout( p=0.2, size_percent=0.05) ),"
+        f"Sometimes({0.5 * aug_percentage}, GaussianBlur(1.2*np.random.rand())),"
+        f"Sometimes({0.5 * aug_percentage}, Add((-25, 25), per_channel=0.3)),"
+        f"Sometimes({0.3 * aug_percentage}, Invert(0.2, per_channel=True)),"
+        f"Sometimes({0.5 * aug_percentage}, Multiply((0.6, 1.4), per_channel=0.5)),"
+        f"Sometimes({0.5 * aug_percentage}, Multiply((0.6, 1.4))),"
+        f"Sometimes({0.5 * aug_percentage}, LinearContrast((0.5, 2.2), per_channel=0.3))"
         "], random_order = False)"
         # aae
     ),
@@ -26,7 +32,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=80,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -38,12 +44,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("lmo_pbr_glue_train",),
-    TEST=("lmo_glue_bop_test",),
-    DET_FILES_TEST=(
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
-        # "datasets/BOP_DATASETS/lmo/test/test_bboxes/gdrnppdet_lmo-test.json",),
+    TRAIN=("tless_random_texture_train_pbr",),
+    TEST=("tless_bop_test_primesense",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
 )
 
 MODEL = dict(
@@ -77,15 +81,15 @@ MODEL = dict(
 )
 
 VAL = dict(
-    DATASET_NAME="lmo",
+    DATASET_NAME="tless",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    #ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
-    ERROR_TYPES="ad",
+    ERROR_TYPES="mspd,mssd,vsd",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
-    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
+    N_TOP=-1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
     EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved

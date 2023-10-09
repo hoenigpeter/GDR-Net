@@ -2,8 +2,11 @@
 
 lmo_objects=("ape" "can" "cat" "driller" "duck" "eggbox" "glue" "holepuncher")
 
-lmo_variants=("lmo" "lmo_random_texture_all")
-lmo_minus_variants=("lmo" "lmo-random-texture-all")
+# lmo_variants=("lmo" "lmo_random_texture_all")
+# lmo_minus_variants=("lmo" "lmo-random-texture-all")
+
+lmo_variants=("lmo_random_texture_all")
+lmo_minus_variants=("lmo-random-texture-all")
 
 # lmo_objects=("ape" "can" "cat" "driller" "duck" "eggbox" "glue" "holepuncher")
 
@@ -28,20 +31,18 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # "brightness" "contrast" "elastic_transform" "pixelate" "jpeg_compression"
 # "speckle_noise" "gaussian_blur" "spatter" "saturate")
 
-perturbations=("1")
-
-noise_types=("gaussian_noise")
+perturbations=("1" "2" "3" "4" "5")
+#["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
+#noise_types=("gaussian_blur")
+noise_types=("gaussian_noise" "shot_noise" "motion_blur" "brightness" "gaussian_blur")
 
 for noise_type in "${noise_types[@]}"
 do
     for perturbation in "${perturbations[@]}"
     do
-        for lmo_variant in "${lmo_variants[@]}"
-        do
-            command="mv ./datasets/BOP_DATASETS/lmo/test/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/000002 ./datasets/BOP_DATASETS/lmo/test/000002"
-            eval "$command"
-            
-        done   
+        command="mv ./datasets/BOP_DATASETS/lmo/perturbations/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/000002 ./datasets/BOP_DATASETS/lmo/test/000002"
+        eval "$command"
+
         for lmo_variant in "${lmo_variants[@]}"
         do
             # Loop through the object names and modify the config file
@@ -166,7 +167,7 @@ do
         done
 
         # Move test image folder back to its location
-        command="mv ./datasets/BOP_DATASETS/lmo/test/000002 ./datasets/BOP_DATASETS/lmo/test/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/000002"
+        command="mv ./datasets/BOP_DATASETS/lmo/test/000002 ./datasets/BOP_DATASETS/lmo/perturbations/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/000002"
         eval "$command"
 
         # copy result files to specific test dataset folder
@@ -175,11 +176,11 @@ do
             lmo_variant="${lmo_variants[i]}"
             lmo_minus_variant="${lmo_minus_variants[i]}"
 
-            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test.csv  ./datasets/BOP_DATASETS/lmo/test/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test.csv"
+            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test.csv  ./datasets/BOP_DATASETS/lmo/perturbations/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test.csv"
             eval "$command"
-            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_col.txt  ./datasets/BOP_DATASETS/lmo/test/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_col.txt"
+            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_col.txt  ./datasets/BOP_DATASETS/lmo/perturbations/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_col.txt"
             eval "$command"
-            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_row.txt  ./datasets/BOP_DATASETS/lmo/test/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_row.txt"
+            command="mv ./output/gdrn/40_epochs/${lmo_variant[@]}_SO/_all/inference_dummy/lmo_bop_test/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_row.txt  ./datasets/BOP_DATASETS/lmo/perturbations/${noise_type[@]}/lmo_test_${noise_type[@]}_${perturbation[@]}/a6-cPnP-${lmo_minus_variant[@]}-1-per-obj-iter0_lmo-test_tab_obj_row.txt"
             eval "$command"
         done
     done
