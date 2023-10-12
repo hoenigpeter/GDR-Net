@@ -33,64 +33,66 @@ if __name__ == "__main__":
     tless_total_ADD_list = []
     tless_random_total_ADD_list = []
 
-    lmo_directory = "./datasets/BOP_DATASETS/lmo/perturbations"
-    tless_directory = "./datasets/BOP_DATASETS/tless/perturbations"
+    lmo_directory = "./datasets/BOP_DATASETS/lmo/perturbations_add_0.1"
+    tless_directory = "./datasets/BOP_DATASETS/tless/perturbations_add_0.1"
 
-    with open(os.path.join(lmo_directory, 'lmo_perturbations.csv'), 'w', newline ='') as lmo_ADD_file:
-        # read the first file
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(lmo_directory, perturbation_type)
-            print(directory)
-            lmo_ADD_list = []
-            lmo_ADD_list.append(48.98)
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(lmo_directory, perturbation_type)
+        print(directory)
+        lmo_ADD_list = []
+        lmo_ADD_list.append(99.03)
 
-            for intensity in intensities:
-                filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                lmo_ADD_list.append(data['Avg(8)']['ad_10'])  
+        for intensity in intensities:
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            lmo_ADD_list.append(data['Avg(8)']['ad_10'])  
 
-            lmo_total_ADD_list.append(lmo_ADD_list)
+        lmo_total_ADD_list.append(lmo_ADD_list)
 
-    with open(os.path.join(lmo_directory, 'lmo_random_perturbations.csv'), 'w', newline ='') as lmo_random_file:
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(lmo_directory, perturbation_type)
-            lmo_random_ADD_list = []
-            lmo_random_ADD_list.append(39.07)
+    print("LMO: ", lmo_total_ADD_list)
 
-            for intensity in intensities:
-                filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                lmo_random_ADD_list.append(data['Avg(8)']['ad_10'])   
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(lmo_directory, perturbation_type)
+        lmo_random_ADD_list = []
+        lmo_random_ADD_list.append(97.51)
 
-            lmo_random_total_ADD_list.append(lmo_random_ADD_list)
+        for intensity in intensities:
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            lmo_random_ADD_list.append(data['Avg(8)']['ad_10'])   
 
-    with open(os.path.join(tless_directory, 'tless_perturbations.csv'), 'w', newline ='') as tless_ADD_file:
-        # read the first file
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(tless_directory, perturbation_type)
-            print(directory)
-            tless_ADD_list = []
-            tless_ADD_list.append(68.86)
+        lmo_random_total_ADD_list.append(lmo_random_ADD_list)
 
-            for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
-                filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                tless_ADD_list.append(data['Avg(30)']['ad_10'])  
+    print("LMO Random: ", lmo_random_total_ADD_list)
 
-            tless_total_ADD_list.append(tless_ADD_list)
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(tless_directory, perturbation_type)
+        print(directory)
+        tless_ADD_list = []
+        tless_ADD_list.append(84.84)
 
-    with open(os.path.join(tless_directory, 'tless_random_perturbations.csv'), 'w', newline ='') as lmo_random_file:
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(tless_directory, perturbation_type)
-            lmo_random_ADD_list = []
-            lmo_random_ADD_list.append(71.71)
+        for intensity in intensities:
+            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            tless_ADD_list.append(data['Avg(30)']['ad_10'])  
 
-            for intensity in intensities:
-                filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                lmo_random_ADD_list.append(data['Avg(30)']['ad_10'])    
+        tless_total_ADD_list.append(tless_ADD_list)
 
-            tless_random_total_ADD_list.append(lmo_random_ADD_list)
+    print("TLESS: ", tless_total_ADD_list)
+
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(tless_directory, perturbation_type)
+        tless_random_ADD_list = []
+        tless_random_ADD_list.append(88.87)
+
+        for intensity in intensities:
+            filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])    
+
+        tless_random_total_ADD_list.append(tless_random_ADD_list)
+
+    print("TLESS Random: ", tless_random_total_ADD_list)
 
     num_rows = 2
     num_cols = 5

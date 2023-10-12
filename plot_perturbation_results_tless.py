@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     perturbation_types=["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
     perturbation_types_print=["Gaussian Noise", "Shot Noise", "Motion Blur", "Brightness", "Gaussian Blur"]
-    
+
     X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
     intensities = [*range(1,6,1)]
@@ -44,7 +44,9 @@ if __name__ == "__main__":
             header, data = read_data(filepath)
             tless_ADD_list.append(data['Avg(30)']['ad_10'])  
 
-            tless_total_ADD_list.append(tless_ADD_list)
+        tless_total_ADD_list.append(tless_ADD_list)
+
+    print(tless_total_ADD_list)
 
     for perturbation_type in perturbation_types:
         directory = os.path.join(tless_directory, perturbation_type)
@@ -55,13 +57,14 @@ if __name__ == "__main__":
         for intensity in intensities:
             filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
             header, data = read_data(filepath)
-            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])    
+            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])
 
         tless_random_total_ADD_list.append(tless_random_ADD_list)
 
+    print(tless_random_total_ADD_list)
+
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types)):
             plt.figure(i + 1)
-            #X = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
             plt.plot(X, tless_total_ADD_list[i], color='red', marker='s', label='TLESS ADD(S)')
 

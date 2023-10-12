@@ -32,35 +32,36 @@ if __name__ == "__main__":
 
     lmo_directory = "./datasets/BOP_DATASETS/lmo/perturbations_add_0.1"
 
-    with open(os.path.join(lmo_directory, 'lmo_perturbations.csv'), 'w', newline ='') as lmo_ADD_file:
-        # read the first file
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(lmo_directory, perturbation_type)
-            print(directory)
-            lmo_ADD_list = []
-            #lmo_ADD_list.append(48.98)
-            lmo_ADD_list.append(99.03)
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(lmo_directory, perturbation_type)
+        print(directory)
+        lmo_ADD_list = []
+        #lmo_ADD_list.append(48.98)
+        lmo_ADD_list.append(99.03)
 
-            for intensity in intensities:
-                filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                lmo_ADD_list.append(data['Avg(8)']['ad_10'])  
+        for intensity in intensities:
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            lmo_ADD_list.append(data['Avg(8)']['ad_10'])  
 
-            lmo_total_ADD_list.append(lmo_ADD_list)
+        lmo_total_ADD_list.append(lmo_ADD_list)
 
-    with open(os.path.join(lmo_directory, 'lmo_random_perturbations.csv'), 'w', newline ='') as lmo_random_file:
-        for perturbation_type in perturbation_types:
-            directory = os.path.join(lmo_directory, perturbation_type)
-            lmo_random_ADD_list = []
-            lmo_random_ADD_list.append(97.51)
-            #lmo_random_ADD_list.append(39.07)
+    print(lmo_total_ADD_list)
 
-            for intensity in intensities:
-                filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
-                header, data = read_data(filepath)
-                lmo_random_ADD_list.append(data['Avg(8)']['ad_10'])   
+    for perturbation_type in perturbation_types:
+        directory = os.path.join(lmo_directory, perturbation_type)
+        lmo_random_ADD_list = []
+        lmo_random_ADD_list.append(97.51)
+        #lmo_random_ADD_list.append(39.07)
 
-            lmo_random_total_ADD_list.append(lmo_random_ADD_list)
+        for intensity in intensities:
+            filepath = os.path.join(directory, "lmo_test_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-lmo-random-texture-all-1-per-obj-iter0_lmo-test_tab_obj_col.txt')
+            header, data = read_data(filepath)
+            lmo_random_ADD_list.append(data['Avg(8)']['ad_10'])
+
+        lmo_random_total_ADD_list.append(lmo_random_ADD_list)
+
+    print(lmo_random_total_ADD_list)
 
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
             plt.figure(i + 1)
