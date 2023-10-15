@@ -1,8 +1,8 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-aug_percentage = 0.4
+aug_percentage = 0.6
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lmo_random_texture_all_0.4"
+OUTPUT_DIR = "output/gdrn/40_epochs/lmo_random_texture_all_0.6"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
@@ -45,7 +45,7 @@ DATASETS = dict(
     DET_FILES_TEST=(
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
         #"datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/gdrnppdet_lmo-test.json",),
+        "datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",),
 )
 
 MODEL = dict(
