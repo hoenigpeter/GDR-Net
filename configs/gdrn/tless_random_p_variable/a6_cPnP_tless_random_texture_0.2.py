@@ -1,8 +1,8 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-aug_percentage = 0.8
+aug_percentage = 0.2
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture_0.8"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture_0.2"
 INPUT = dict(
     MIN_SIZE_TRAIN=540,
     MAX_SIZE_TRAIN=720,

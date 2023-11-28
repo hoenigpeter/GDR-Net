@@ -109,7 +109,7 @@ if __name__ == "__main__":
         axis.plot(X, lmo_random_total_ADD_list[i], color='red', marker='o', label='LMO Random')
 
         axes[row, col].set_xlabel('Severity', fontsize=14)
-        axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(-S)', fontsize=14)
         axes[row, col].set_title(letter + ") " + directory, fontsize=16)
         axes[row, col].set_xticks(X)
     
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Random')
 
         axes[row, col].set_xlabel('Severity', fontsize=14)
-        axes[row, 0].set_ylabel('ADD(S)', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(-S)', fontsize=14)
         axes[row, col].set_title(letter + ") " + directory, fontsize=16)
         axes[row, col].set_xticks(X)
 
