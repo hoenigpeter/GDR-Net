@@ -40,9 +40,9 @@ SOLVER = dict(
 DATASETS = dict(
     #TRAIN=("VAR_train_pbr",),
     TEST=("tless_bop_test_primesense",),
-    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
     #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
 )
 
 MODEL = dict(
@@ -80,7 +80,7 @@ VAL = dict(
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
     #ERROR_TYPES="mspd,mssd,vsd,ad",
-    ERROR_TYPES="ad",
+    ERROR_TYPES="mspd,mssd,vsd,ad",
     #RENDERER_TYPE="cpp",  # cpp, python, egl
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",

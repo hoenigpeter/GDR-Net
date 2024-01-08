@@ -43,9 +43,9 @@ SOLVER = dict(
 DATASETS = dict(
     #TRAIN=("tless_random_texture_2_train_pbr",),
     TEST=("tless_2_bop_test_primesense",),
-    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
     #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
 )
 
 MODEL = dict(

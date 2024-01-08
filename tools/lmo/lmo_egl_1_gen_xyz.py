@@ -64,12 +64,10 @@ def normalize_to_01(img):
     else:
         return img
 
-
 def get_emb_show(bbox_emb):
     show_emb = bbox_emb.copy()
     show_emb = normalize_to_01(bbox_emb)
     return show_emb
-
 
 class XyzGen(object):
     def __init__(self):
@@ -184,16 +182,16 @@ class XyzGen(object):
                             "xyxy": [x1, y1, x2, y2],
                         }
 
-                        if VIS:
-                            xyz_th_cpu = xyz_th.cpu().numpy()
-                            print(f"xyz min {xyz_th_cpu.min()} max {xyz_th_cpu.max()}")
-                            show_ims = [
-                                bgr_gl[:, :, [2, 1, 0]],
-                                get_emb_show(xyz_th_cpu),
-                                get_emb_show(xyz_crop),
-                            ]
-                            show_titles = ["bgr_gl", "xyz", "xyz_crop"]
-                            grid_show(show_ims, show_titles, row=1, col=3)
+                        # if VIS:
+                        #     xyz_th_cpu = xyz_th.cpu().numpy()
+                        #     print(f"xyz min {xyz_th_cpu.min()} max {xyz_th_cpu.max()}")
+                        #     show_ims = [
+                        #         bgr_gl[:, :, [2, 1, 0]],
+                        #         get_emb_show(xyz_th_cpu),
+                        #         get_emb_show(xyz_crop),
+                        #     ]
+                        #     show_titles = ["bgr_gl", "xyz", "xyz_crop"]
+                        #     grid_show(show_ims, show_titles, row=1, col=3)
 
                     mmcv.mkdir_or_exist(osp.dirname(save_path))
                     mmcv.dump(xyz_info, save_path)

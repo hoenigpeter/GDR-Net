@@ -94,55 +94,55 @@ if __name__ == "__main__":
 
     print("TLESS Random: ", tless_random_total_ADD_list)
 
-    num_rows = 1
+    num_rows = 2
     num_cols = 5
 
-    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 3))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 6))
 
-    # for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
-    #     row = 0
-    #     col = i % num_cols
-
-    #     axis = axes[row, col]  # Access the 2D array of axes
-
-    #     axis.plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='LMO Original')
-    #     axis.plot(X, lmo_random_total_ADD_list[i], color='red', marker='o', label='LMO Random')
-
-    #     axes[row, col].set_xlabel('Severity', fontsize=14)
-    #     axes[row, 0].set_ylabel('ADD(-S)', fontsize=14)
-    #     axes[row, col].set_title(letter + ") " + directory, fontsize=16)
-    #     axes[row, col].set_xticks(X)
-    
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types_print)):
         row = 0
         col = i % num_cols
 
-        axis = axes[col]  # Access the 2D array of axes
+        axis = axes[row, col]  # Access the 2D array of axes
+
+        axis.plot(X, lmo_total_ADD_list[i], color='green', marker='s', label='LMO Original')
+        axis.plot(X, lmo_random_total_ADD_list[i], color='red', marker='o', label='LMO Random')
+
+        axes[row, col].set_xlabel('Severity', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(-S)', fontsize=14)
+        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+        axes[row, col].set_xticks(X)
+    
+    for letter, (i, directory) in zip(string.ascii_lowercase[num_cols:], enumerate(perturbation_types_print)):
+        row = 1
+        col = i % num_cols
+
+        axis = axes[row, col]  # Access the 2D array of axes
 
         axis.plot(X, tless_total_ADD_list[i], color='purple', marker='s', label='TLESS Original')
-        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Randomized Texture')
+        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Random')
 
-        axes[col].set_xlabel('Severity', fontsize=14)
-        axes[0].set_ylabel('ADD(-S)', fontsize=14)
-        axes[col].set_title(letter + ") " + directory, fontsize=16)
-        axes[col].set_xticks(X)
+        axes[row, col].set_xlabel('Severity', fontsize=14)
+        axes[row, 0].set_ylabel('ADD(-S)', fontsize=14)
+        axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+        axes[row, col].set_xticks(X)
     # axes[0, 1].legend()
     # axes[1, 1].legend()
 
     # Get handles and labels from axes[0, 1]
-    handles1, labels1 = axes[0].get_legend_handles_labels()
+    handles1, labels1 = axes[0, 1].get_legend_handles_labels()
 
     # Get handles and labels from axes[1, 1]
-    # handles2, labels2 = axes[1, 1].get_legend_handles_labels()
+    handles2, labels2 = axes[1, 1].get_legend_handles_labels()
 
     # Combine the handles and labels
-    all_handles = handles1
-    all_labels = labels1
+    all_handles = handles1 + handles2
+    all_labels = labels1 + labels2
     print(all_labels)
     print(all_handles)
     # fig.legend(all_handles, all_labels, loc='lower right', fontsize=14, bbox_to_anchor=(1.1, 1.05))
     # fig.legend(handles, labels, fontsize=14, bbox_to_anchor=(1.15, 0))
-    fig.legend(all_handles, all_labels, fontsize=14, loc='lower center', bbox_to_anchor=(0.5, -0.06), ncol=4)
+    fig.legend(all_handles, all_labels, fontsize=14, loc='lower center', bbox_to_anchor=(0.5, -0.03), ncol=4)
     fig.tight_layout()
     #fig.savefig('image_output.png', dpi=300, format='png', bbox_inches='tight')
     fig.savefig('image_output.png', dpi=300, format='png', bbox_inches='tight')
