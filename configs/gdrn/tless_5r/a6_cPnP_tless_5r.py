@@ -9,7 +9,7 @@ INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
-    COLOR_AUG_PROB=0.8,
+    COLOR_AUG_PROB=0,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
         "Sequential(["
