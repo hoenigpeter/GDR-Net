@@ -254,7 +254,6 @@ class GDRN(nn.Module):
 
             # Convert the array to 8-bit unsigned integer type
             combined_array = np.uint8(combined_array)
-            print(combined_array.shape)
             # # Transpose the array to have shape (64, 64, 3) for RGB image format
             # combined_array = np.transpose(combined_array.squeeze(), (1, 2, 0))
 

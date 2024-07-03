@@ -16,8 +16,8 @@ done
 # tless_variants=("tless" "tless_random_texture")
 # tless_minus_variants=("tless" "tless-random-texture")
 
-tless_variants=("tless_random_texture")
-tless_minus_variants=("tless-random-texture")
+tless_variants=("tless" "tless_random_texture")
+tless_minus_variants=("tless" "tless-random-texture")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 

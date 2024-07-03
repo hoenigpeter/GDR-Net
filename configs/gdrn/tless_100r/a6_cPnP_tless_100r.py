@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tless_7r"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_100r"
 INPUT = dict(
     MIN_SIZE_TRAIN=540,
     MAX_SIZE_TRAIN=720,
@@ -30,7 +30,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=10,
+    TOTAL_EPOCHS=40,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -42,9 +42,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("tless_7r_train_pbr",),
+    TRAIN=("tless_100r_train_pbr",),
     TEST=("tless_bop_test_primesense",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
 )
 
 MODEL = dict(
@@ -81,8 +82,8 @@ VAL = dict(
     DATASET_NAME="tless",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
-    #RENDERER_TYPE="cpp",  # cpp, python, egl
+    ERROR_TYPES="mspd,mssd,vsd",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",

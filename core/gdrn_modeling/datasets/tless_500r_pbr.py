@@ -1,5 +1,5 @@
-import hashlib
 import logging
+import hashlib
 import os
 import os.path as osp
 import sys
@@ -9,10 +9,12 @@ PROJ_ROOT = osp.normpath(osp.join(cur_dir, "../../.."))
 sys.path.insert(0, PROJ_ROOT)
 import time
 from collections import OrderedDict
+
 import mmcv
 import numpy as np
 from tqdm import tqdm
 from transforms3d.quaternions import mat2quat, quat2mat
+
 import ref
 from detectron2.data import DatasetCatalog, MetadataCatalog
 from detectron2.structures import BoxMode
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 DATASETS_ROOT = osp.normpath(osp.join(PROJ_ROOT, "datasets"))
 
 
-class LM_PBR_Dataset:
+class TLESS_PBR_Dataset:
     def __init__(self, data_cfg):
         """
         Set with_depth and with_masks default to True,
@@ -35,33 +37,31 @@ class LM_PBR_Dataset:
         self.name = data_cfg["name"]
         self.data_cfg = data_cfg
 
-        self.objs = data_cfg["objs"]  # selected objects
+        self.objs = data_cfg["objs"]  # selected objs
 
-        self.dataset_root = data_cfg.get("dataset_root", osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/train_pbr"))
-        self.xyz_root = data_cfg.get("xyz_root", osp.join(self.dataset_root, "xyz_crop"))
+        self.dataset_root = data_cfg.get("dataset_root", osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/train_pbr"))
         assert osp.exists(self.dataset_root), self.dataset_root
-        self.models_root = data_cfg["models_root"]  # BOP_DATASETS/lm/models
+        self.xyz_root = data_cfg.get("xyz_root", osp.join(self.dataset_root, "xyz_crop"))
+        self.models_root = data_cfg["models_root"]  # BOP_DATASETS/tless/models_cad
         self.scale_to_meter = data_cfg["scale_to_meter"]  # 0.001
 
         self.with_masks = data_cfg["with_masks"]
         self.with_depth = data_cfg["with_depth"]
 
-        self.height = data_cfg["height"]  # 480
-        self.width = data_cfg["width"]  # 640
+        self.height = data_cfg["height"]
+        self.width = data_cfg["width"]
 
-        self.cache_dir = data_cfg.get("cache_dir", osp.join(PROJ_ROOT, ".cache"))  # .cache
-        self.use_cache = data_cfg.get("use_cache", True)
         self.num_to_load = data_cfg["num_to_load"]  # -1
         self.filter_invalid = data_cfg.get("filter_invalid", True)
-        ##################################################
+        self.use_cache = data_cfg.get("use_cache", True)
+        self.cache_dir = data_cfg.get("cache_dir", osp.join(PROJ_ROOT, ".cache"))  # .cache
 
         # NOTE: careful! Only the selected objects
-        self.cat_ids = [cat_id for cat_id, obj_name in ref.lm_full.id2obj.items() if obj_name in self.objs]
-        # map selected objs to [0, num_objs-1]
+        self.cat_ids = [cat_id for cat_id, obj_name in ref.tless.id2obj.items() if obj_name in self.objs]
+        # map selected objs to [0, num_objs)
         self.cat2label = {v: i for i, v in enumerate(self.cat_ids)}  # id_map
         self.label2cat = {label: cat for cat, label in self.cat2label.items()}
         self.obj2label = OrderedDict((obj, obj_id) for obj_id, obj in enumerate(self.objs))
-        ##########################################################
 
         self.scenes = [f"{i:06d}" for i in range(50)]
 
@@ -77,7 +77,11 @@ class LM_PBR_Dataset:
             (
                 "".join([str(fn) for fn in self.objs])
                 + "dataset_dicts_{}_{}_{}_{}_{}".format(
-                    self.name, self.dataset_root, self.with_masks, self.with_depth, __name__
+                    self.name,
+                    self.dataset_root,
+                    self.with_masks,
+                    self.with_depth,
+                    __name__,
                 )
             ).encode("utf-8")
         ).hexdigest()
@@ -90,10 +94,12 @@ class LM_PBR_Dataset:
         t_start = time.perf_counter()
 
         logger.info("loading dataset dicts: {}".format(self.name))
+
+        dataset_dicts = []
         self.num_instances_without_valid_segmentation = 0
         self.num_instances_without_valid_box = 0
-        dataset_dicts = []  # ######################################################
         # it is slow because of loading and converting masks to rle
+
         for scene in tqdm(self.scenes):
             scene_id = int(scene)
             scene_root = osp.join(self.dataset_root, scene)
@@ -142,6 +148,7 @@ class LM_PBR_Dataset:
 
                     bbox_visib = gt_info_dict[str_im_id][anno_i]["bbox_visib"]
                     bbox_obj = gt_info_dict[str_im_id][anno_i]["bbox_obj"]
+
                     x1, y1, w, h = bbox_visib
                     if self.filter_invalid:
                         if h <= 1 or w <= 1:
@@ -149,39 +156,50 @@ class LM_PBR_Dataset:
                             continue
 
                     mask_file = osp.join(scene_root, "mask/{:06d}_{:06d}.png".format(int_im_id, anno_i))
-                    mask_visib_file = osp.join(scene_root, "mask_visib/{:06d}_{:06d}.png".format(int_im_id, anno_i))
+                    mask_visib_file = osp.join(
+                        scene_root,
+                        "mask_visib/{:06d}_{:06d}.png".format(int_im_id, anno_i),
+                    )
                     assert osp.exists(mask_file), mask_file
                     assert osp.exists(mask_visib_file), mask_visib_file
-                    # load mask visib  TODO: load both mask_visib and mask_full
+                    # load mask visib
                     mask_single = mmcv.imread(mask_visib_file, "unchanged")
                     area = mask_single.sum()
-                    if area < 3:  # filter out too small or nearly invisible instances
+                    if area <= 64:  # filter out too small or nearly invisible instances
                         self.num_instances_without_valid_segmentation += 1
                         continue
+                    mask_rle = binary_mask_to_rle(mask_single, compressed=True)
+
+                    # load mask full
+                    mask_full = mmcv.imread(mask_file, "unchanged")
+                    mask_full = mask_full.astype("bool")
+                    mask_full_rle = binary_mask_to_rle(mask_full, compressed=True)
 
                     visib_fract = gt_info_dict[str_im_id][anno_i].get("visib_fract", 1.0)
 
-                    mask_rle = binary_mask_to_rle(mask_single, compressed=True)
+                    xyz_path = osp.join(
+                        self.xyz_root,
+                        f"{scene_id:06d}/{int_im_id:06d}_{anno_i:06d}-xyz.pkl",
+                    )
+                    # assert osp.exists(xyz_path), xyz_path
 
-                    xyz_path = osp.join(self.xyz_root, f"{scene_id:06d}/{int_im_id:06d}_{anno_i:06d}-xyz.pkl")
-                    assert osp.exists(xyz_path), xyz_path
                     inst = {
                         "category_id": cur_label,  # 0-based label
-                        "bbox": bbox_visib,  # TODO: load both bbox_obj and bbox_visib
+                        "bbox": bbox_visib,
+                        "bbox_obj": bbox_obj,
                         "bbox_mode": BoxMode.XYWH_ABS,
                         "pose": pose,
                         "quat": quat,
                         "trans": t,
                         "centroid_2d": proj,  # absolute (cx, cy)
                         "segmentation": mask_rle,
-                        "mask_full_file": mask_file,  # TODO: load as mask_full, rle
+                        "mask_full": mask_full_rle,  # TODO: load as mask_full, rle
                         "visib_fract": visib_fract,
                         "xyz_path": xyz_path,
                     }
 
                     model_info = self.models_info[str(obj_id)]
                     inst["model_info"] = model_info
-                    # TODO: using full mask and full xyz
                     for key in ["bbox3d_and_center"]:
                         inst[key] = self.models[cur_label][key]
                     insts.append(inst)
@@ -202,7 +220,7 @@ class LM_PBR_Dataset:
                 "Filtered out {} instances without valid box. "
                 "There might be issues in your dataset generation process.".format(self.num_instances_without_valid_box)
             )
-        ##########################################################################
+        ##########################
         if self.num_to_load > 0:
             self.num_to_load = min(int(self.num_to_load), len(dataset_dicts))
             dataset_dicts = dataset_dicts[: self.num_to_load]
@@ -231,17 +249,19 @@ class LM_PBR_Dataset:
         models = []
         for obj_name in self.objs:
             model = inout.load_ply(
-                osp.join(self.models_root, f"obj_{ref.lm_full.obj2id[obj_name]:06d}.ply"),
+                osp.join(self.models_root, f"obj_{ref.tless.obj2id[obj_name]:06d}.ply"),
                 vertex_scale=self.scale_to_meter,
             )
             # NOTE: the bbox3d_and_center is not obtained from centered vertices
             # for BOP models, not a big problem since they had been centered
             model["bbox3d_and_center"] = misc.get_bbox3d_and_center(model["pts"])
-
             models.append(model)
         logger.info("cache models to {}".format(cache_path))
         mmcv.dump(models, cache_path, protocol=4)
         return models
+
+    def __len__(self):
+        return self.num_to_load
 
     def image_aspect_ratio(self):
         return self.width / self.height  # 4/3
@@ -250,7 +270,7 @@ class LM_PBR_Dataset:
 ########### register datasets ############################################################
 
 
-def get_lm_metadata(obj_names, ref_key):
+def get_tless_metadata(obj_names, ref_key):
     """task specific metadata."""
 
     data_ref = ref.__dict__[ref_key]
@@ -272,118 +292,49 @@ def get_lm_metadata(obj_names, ref_key):
     return meta
 
 
-LM_13_OBJECTS = [
-    "ape",
-    "benchvise",
-    "camera",
-    "can",
-    "cat",
-    "driller",
-    "duck",
-    "eggbox",
-    "glue",
-    "holepuncher",
-    "iron",
-    "lamp",
-    "phone",
-]  # no bowl, cup
-LM_OCC_OBJECTS = ["ape", "can", "cat", "driller", "duck", "eggbox", "glue", "holepuncher"]
-lm_model_root = "BOP_DATASETS/lm/models/"
-lmo_model_root = "BOP_DATASETS/lmo/models/"
+tless_model_root = "BOP_DATASETS/tless_500r/models_cad/"
 ################################################################################
 
 
-SPLITS_LM_PBR = dict(
-    lm_pbr_13_train=dict(
-        name="lm_pbr_13_train",
-        objs=LM_13_OBJECTS,  # selected objects
-        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/train_pbr"),
-        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/models"),
-        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/train_pbr/xyz_crop"),
+SPLITS_TLESS_PBR = dict(
+    tless_500r_train_pbr=dict(
+        name="tless_500r_train_pbr",
+        objs=ref.tless_500r.objects,  # selected objects
+        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/train_pbr"),
+        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/models_cad"),
+        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/train_pbr/xyz_crop"),
         scale_to_meter=0.001,
         with_masks=True,  # (load masks but may not use it)
         with_depth=True,  # (load depth path here, but may not use it)
-        height=480,
-        width=640,
-        cache_dir=osp.join(PROJ_ROOT, ".cache"),
+        height=540,
+        width=720,
         use_cache=True,
         num_to_load=-1,
         filter_invalid=True,
-        ref_key="lm_full",
-    ),
-    lmo_3r_1o_pbr_train=dict(
-        name="lmo_3r_1o_pbr_train",
-        objs=LM_OCC_OBJECTS,  # selected objects
-        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/train_pbr"),
-        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/models"),
-        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/train_pbr/xyz_crop"),
-        scale_to_meter=0.001,
-        with_masks=True,  # (load masks but may not use it)
-        with_depth=True,  # (load depth path here, but may not use it)
-        height=480,
-        width=640,
-        cache_dir=osp.join(PROJ_ROOT, ".cache"),
-        use_cache=True,
-        num_to_load=-1,
-        filter_invalid=True,
-        ref_key="lmo_3r_1o_full",
+        ref_key="tless_500r",
     ),
 )
 
-""" # single obj splits
-for obj in ref.lm_full.objects:
-    for split in ["train"]:
-        name = "lm_pbr_{}_{}".format(obj, split)
-        if split in ["train"]:
-            filter_invalid = True
-        elif split in ["test"]:
-            filter_invalid = False
-        else:
-            raise ValueError("{}".format(split))
-        if name not in SPLITS_LM_PBR:
-            SPLITS_LM_PBR[name] = dict(
+# single obj splits
+for obj in ref.tless_500r.objects:
+    for split in ["train_pbr"]:
+        name = "tless_500r_{}_{}".format(obj, split)
+        if name not in SPLITS_TLESS_PBR:
+            SPLITS_TLESS_PBR[name] = dict(
                 name=name,
                 objs=[obj],  # only this obj
-                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/train_pbr"),
-                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/models"),
-                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lm/train_pbr/xyz_crop"),
+                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/train_pbr"),
+                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/models_cad"),
+                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_500r/train_pbr/xyz_crop"),
                 scale_to_meter=0.001,
                 with_masks=True,  # (load masks but may not use it)
                 with_depth=True,  # (load depth path here, but may not use it)
-                height=480,
-                width=640,
-                cache_dir=osp.join(PROJ_ROOT, ".cache"),
+                height=540,
+                width=720,
                 use_cache=True,
                 num_to_load=-1,
-                filter_invalid=filter_invalid,
-                ref_key="lm_full",
-            ) """
-
-# lmo single objs
-for obj in ref.lmo_full.objects:
-    for split in ["train"]:
-        name = "lmo_3r_1o_pbr_{}_{}".format(obj, split)
-        if split in ["train"]:
-            filter_invalid = True
-        else:
-            raise ValueError("{}".format(split))
-        if name not in SPLITS_LM_PBR:
-            SPLITS_LM_PBR[name] = dict(
-                name=name,
-                objs=[obj],  # only this obj
-                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/train_pbr"),
-                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/models"),
-                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/lmo_3r_1o/train_pbr/xyz_crop"),
-                scale_to_meter=0.001,
-                with_masks=True,  # (load masks but may not use it)
-                with_depth=True,  # (load depth path here, but may not use it)
-                height=480,
-                width=640,
-                cache_dir=osp.join(PROJ_ROOT, ".cache"),
-                use_cache=True,
-                num_to_load=-1,
-                filter_invalid=filter_invalid,
-                ref_key="lmo_3r_1o_full",
+                filter_invalid=True,
+                ref_key="tless_500r",
             )
 
 
@@ -397,25 +348,25 @@ def register_with_name_cfg(name, data_cfg=None):
             data_cfg can be set in cfg.DATA_CFG.name
     """
     dprint("register dataset: {}".format(name))
-    if name in SPLITS_LM_PBR:
-        used_cfg = SPLITS_LM_PBR[name]
+    if name in SPLITS_TLESS_PBR:
+        used_cfg = SPLITS_TLESS_PBR[name]
     else:
         assert data_cfg is not None, f"dataset name {name} is not registered"
         used_cfg = data_cfg
-    DatasetCatalog.register(name, LM_PBR_Dataset(used_cfg))
+    DatasetCatalog.register(name, TLESS_PBR_Dataset(used_cfg))
     # something like eval_types
     MetadataCatalog.get(name).set(
-        id="linemod",  # NOTE: for pvnet to determine module
+        id="tless",  # NOTE: for pvnet to determine module
         ref_key=used_cfg["ref_key"],
         objs=used_cfg["objs"],
         eval_error_types=["ad", "rete", "proj"],
         evaluator_type="bop",
-        **get_lm_metadata(obj_names=used_cfg["objs"], ref_key=used_cfg["ref_key"]),
+        **get_tless_metadata(obj_names=used_cfg["objs"], ref_key=used_cfg["ref_key"]),
     )
 
 
 def get_available_datasets():
-    return list(SPLITS_LM_PBR.keys())
+    return list(SPLITS_TLESS_PBR.keys())
 
 
 #### tests ###############################################
@@ -434,7 +385,7 @@ def test_vis():
     dirname = "output/{}-data-vis".format(dset_name)
     os.makedirs(dirname, exist_ok=True)
     for d in dicts:
-        img = read_image_cv2(d["file_name"], format="BGR")
+        img = read_image_mmcv(d["file_name"], format="BGR")
         depth = mmcv.imread(d["depth_file"], "unchanged") / 10000.0
 
         imH, imW = img.shape[:2]
@@ -457,25 +408,28 @@ def test_vis():
         labels = [objs[cat_id] for cat_id in cat_ids]
         for _i in range(len(annos)):
             img_vis = vis_image_mask_bbox_cv2(
-                img, masks[_i : _i + 1], bboxes=bboxes_xyxy[_i : _i + 1], labels=labels[_i : _i + 1]
+                img,
+                masks[_i : _i + 1],
+                bboxes=bboxes_xyxy[_i : _i + 1],
+                labels=labels[_i : _i + 1],
             )
             img_vis_kpts2d = misc.draw_projected_box3d(img_vis.copy(), kpts_2d[_i])
-            xyz_path = annos[_i]["xyz_path"]
-            xyz_info = mmcv.load(xyz_path)
-            x1, y1, x2, y2 = xyz_info["xyxy"]
-            xyz_crop = xyz_info["xyz_crop"].astype(np.float32)
-            xyz = np.zeros((imH, imW, 3), dtype=np.float32)
-            xyz[y1 : y2 + 1, x1 : x2 + 1, :] = xyz_crop
-            xyz_show = get_emb_show(xyz)
-            xyz_crop_show = get_emb_show(xyz_crop)
-            img_xyz = img.copy() / 255.0
-            mask_xyz = ((xyz[:, :, 0] != 0) | (xyz[:, :, 1] != 0) | (xyz[:, :, 2] != 0)).astype("uint8")
-            fg_idx = np.where(mask_xyz != 0)
-            img_xyz[fg_idx[0], fg_idx[1], :] = xyz_show[fg_idx[0], fg_idx[1], :3]
-            img_xyz_crop = img_xyz[y1 : y2 + 1, x1 : x2 + 1, :]
-            img_vis_crop = img_vis[y1 : y2 + 1, x1 : x2 + 1, :]
-            # diff mask
-            diff_mask_xyz = np.abs(masks[_i] - mask_xyz)[y1 : y2 + 1, x1 : x2 + 1]
+            # xyz_path = annos[_i]["xyz_path"]
+            # xyz_info = mmcv.load(xyz_path)
+            # x1, y1, x2, y2 = xyz_info["xyxy"]
+            # xyz_crop = xyz_info["xyz_crop"].astype(np.float32)
+            # xyz = np.zeros((imH, imW, 3), dtype=np.float32)
+            # xyz[y1 : y2 + 1, x1 : x2 + 1, :] = xyz_crop
+            # xyz_show = get_emb_show(xyz)
+            # xyz_crop_show = get_emb_show(xyz_crop)
+            # img_xyz = img.copy() / 255.0
+            # mask_xyz = ((xyz[:, :, 0] != 0) | (xyz[:, :, 1] != 0) | (xyz[:, :, 2] != 0)).astype("uint8")
+            # fg_idx = np.where(mask_xyz != 0)
+            # img_xyz[fg_idx[0], fg_idx[1], :] = xyz_show[fg_idx[0], fg_idx[1], :3]
+            # img_xyz_crop = img_xyz[y1 : y2 + 1, x1 : x2 + 1, :]
+            # img_vis_crop = img_vis[y1 : y2 + 1, x1 : x2 + 1, :]
+            # # diff mask
+            # diff_mask_xyz = np.abs(masks[_i] - mask_xyz)[y1 : y2 + 1, x1 : x2 + 1]
 
             grid_show(
                 [
@@ -483,26 +437,25 @@ def test_vis():
                     img_vis[:, :, [2, 1, 0]],
                     img_vis_kpts2d[:, :, [2, 1, 0]],
                     depth,
-                    # xyz_show,
-                    diff_mask_xyz,
-                    xyz_crop_show,
-                    img_xyz[:, :, [2, 1, 0]],
-                    img_xyz_crop[:, :, [2, 1, 0]],
-                    img_vis_crop,
+                    # diff_mask_xyz,
+                    # xyz_crop_show,
+                    # img_xyz[:, :, [2, 1, 0]],
+                    # img_xyz_crop[:, :, [2, 1, 0]],
+                    # img_vis_crop,
                 ],
                 [
                     "img",
                     "vis_img",
                     "img_vis_kpts2d",
                     "depth",
-                    "diff_mask_xyz",
-                    "xyz_crop_show",
-                    "img_xyz",
-                    "img_xyz_crop",
-                    "img_vis_crop",
+                    # "diff_mask_xyz",
+                    # "xyz_crop_show",
+                    # "img_xyz",
+                    # "img_xyz_crop",
+                    # "img_vis_crop",
                 ],
-                row=3,
-                col=3,
+                row=2,
+                col=2,
             )
 
 
@@ -510,18 +463,18 @@ if __name__ == "__main__":
     """Test the  dataset loader.
 
     Usage:
-        python -m core.datasets.lm_pbr dataset_name
+        python -m this_module dataset_name
     """
     from lib.vis_utils.image import grid_show
-    from lib.utils.setup_logger import setup_logger
+    from lib.utils.setup_logger import setup_my_logger
 
     import detectron2.data.datasets  # noqa # add pre-defined metadata
     from lib.vis_utils.image import vis_image_mask_bbox_cv2
     from core.utils.utils import get_emb_show
-    from core.utils.data_utils import read_image_cv2
+    from core.utils.data_utils import read_image_mmcv
 
     print("sys.argv:", sys.argv)
-    setup_logger()
+    logger = setup_my_logger(name="core")
     register_with_name_cfg(sys.argv[1])
     print("dataset catalog: ", DatasetCatalog.list())
 

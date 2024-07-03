@@ -30,7 +30,8 @@ if __name__ == "__main__":
     tless_total_ADD_list = []
     tless_random_total_ADD_list = []
 
-    tless_directory = "./datasets/BOP_DATASETS/tless/perturbations_add_0.1"
+    #tless_directory = "./datasets/BOP_DATASETS/tless/perturbations_add_0.1"
+    tless_directory = "/hdd/datasets_bop/tless/perturbations_add_0.1"
 
     for perturbation_type in perturbation_types:
         directory = os.path.join(tless_directory, perturbation_type)
@@ -42,7 +43,7 @@ if __name__ == "__main__":
         for intensity in intensities:                                                                    #a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt
             filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-1-per-obj-iter0_tless-test_tab_obj_col.txt')
             header, data = read_data(filepath)
-            tless_ADD_list.append(data['Avg(30)']['ad_10'])  
+            tless_ADD_list.append(data['Avg(30)']['ad_0.100'])  
 
         tless_total_ADD_list.append(tless_ADD_list)
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         for intensity in intensities:
             filepath = os.path.join(directory, "test_primesense_" + perturbation_type + "_" + str(intensity) + '/a6-cPnP-tless-random-texture-1-per-obj-iter0_tless-test_tab_obj_col.txt')
             header, data = read_data(filepath)
-            tless_random_ADD_list.append(data['Avg(30)']['ad_10'])
+            tless_random_ADD_list.append(data['Avg(30)']['ad_0.100'])
 
         tless_random_total_ADD_list.append(tless_random_ADD_list)
 
@@ -66,9 +67,9 @@ if __name__ == "__main__":
     for letter, (i, directory) in zip(string.ascii_lowercase, enumerate(perturbation_types)):
             plt.figure(i + 1)
 
-            plt.plot(X, tless_total_ADD_list[i], color='red', marker='s', label='TLESS ADD(S)')
+            plt.plot(X, tless_total_ADD_list[i], color='red', marker='s', label='TLESS ADD(-S)')
 
-            plt.plot(X, tless_random_total_ADD_list[i], color='orange', marker='s', label='TLESS Random ADD(S)')
+            plt.plot(X, tless_random_total_ADD_list[i], color='orange', marker='s', label='TLESS Random ADD(-S)')
 
             plt.xlabel('Severity', fontsize=14)
             plt.ylabel('Error',fontsize=14)

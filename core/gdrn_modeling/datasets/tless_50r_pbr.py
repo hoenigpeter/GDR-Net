@@ -39,7 +39,7 @@ class TLESS_PBR_Dataset:
 
         self.objs = data_cfg["objs"]  # selected objs
 
-        self.dataset_root = data_cfg.get("dataset_root", osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/train_pbr"))
+        self.dataset_root = data_cfg.get("dataset_root", osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/train_pbr"))
         assert osp.exists(self.dataset_root), self.dataset_root
         self.xyz_root = data_cfg.get("xyz_root", osp.join(self.dataset_root, "xyz_crop"))
         self.models_root = data_cfg["models_root"]  # BOP_DATASETS/tless/models_cad
@@ -292,17 +292,17 @@ def get_tless_metadata(obj_names, ref_key):
     return meta
 
 
-tless_model_root = "BOP_DATASETS/tless_7r/models_cad/"
+tless_model_root = "BOP_DATASETS/tless_50r/models_cad/"
 ################################################################################
 
 
 SPLITS_TLESS_PBR = dict(
-    tless_7r_train_pbr=dict(
-        name="tless_7r_train_pbr",
-        objs=ref.tless_7r.objects,  # selected objects
-        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/train_pbr"),
-        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/models_cad"),
-        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/train_pbr/xyz_crop"),
+    tless_50r_train_pbr=dict(
+        name="tless_50r_train_pbr",
+        objs=ref.tless_50r.objects,  # selected objects
+        dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/train_pbr"),
+        models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/models_cad"),
+        xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/train_pbr/xyz_crop"),
         scale_to_meter=0.001,
         with_masks=True,  # (load masks but may not use it)
         with_depth=True,  # (load depth path here, but may not use it)
@@ -311,21 +311,21 @@ SPLITS_TLESS_PBR = dict(
         use_cache=True,
         num_to_load=-1,
         filter_invalid=True,
-        ref_key="tless_7r",
+        ref_key="tless_50r",
     ),
 )
 
 # single obj splits
-for obj in ref.tless_7r.objects:
+for obj in ref.tless_50r.objects:
     for split in ["train_pbr"]:
-        name = "tless_7r_{}_{}".format(obj, split)
+        name = "tless_50r_{}_{}".format(obj, split)
         if name not in SPLITS_TLESS_PBR:
             SPLITS_TLESS_PBR[name] = dict(
                 name=name,
                 objs=[obj],  # only this obj
-                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/train_pbr"),
-                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/models_cad"),
-                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_7r/train_pbr/xyz_crop"),
+                dataset_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/train_pbr"),
+                models_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/models_cad"),
+                xyz_root=osp.join(DATASETS_ROOT, "BOP_DATASETS/tless_50r/train_pbr/xyz_crop"),
                 scale_to_meter=0.001,
                 with_masks=True,  # (load masks but may not use it)
                 with_depth=True,  # (load depth path here, but may not use it)
@@ -334,7 +334,7 @@ for obj in ref.tless_7r.objects:
                 use_cache=True,
                 num_to_load=-1,
                 filter_invalid=True,
-                ref_key="tless_7r",
+                ref_key="tless_50r",
             )
 
 

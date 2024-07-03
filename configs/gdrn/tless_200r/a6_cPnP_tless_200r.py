@@ -1,7 +1,11 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/tless_SO/_all"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_200r"
 INPUT = dict(
+    MIN_SIZE_TRAIN=540,
+    MAX_SIZE_TRAIN=720,
+    MIN_SIZE_TEST=540,
+    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
@@ -38,11 +42,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("tless_train_pbr",),
+    TRAIN=("tless_200r_train_pbr",),
     TEST=("tless_bop_test_primesense",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
-    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
-    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
 )
 
 MODEL = dict(
@@ -79,14 +82,13 @@ VAL = dict(
     DATASET_NAME="tless",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    #ERROR_TYPES="mspd,mssd,vsd,ad",
-    ERROR_TYPES="ad",
-    #RENDERER_TYPE="cpp",  # cpp, python, egl
+    ERROR_TYPES="mspd,mssd,vsd",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
     N_TOP=-1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
-    EVAL_CACHED=True,  # if the predicted poses have been saved
+    EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall
