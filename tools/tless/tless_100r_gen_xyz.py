@@ -30,11 +30,11 @@ IM_W = 720
 near = 0.01
 far = 6.5
 
-data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/tless_7r/train_pbr"))
+data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/tless_100r/train_pbr"))
 
 cls_indexes = [_idx for _idx in sorted(idx2class.keys())]
 cls_names = [idx2class[cls_idx] for cls_idx in cls_indexes]
-model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/tless_7r/models_cad"))
+model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/tless_100r/models_cad"))
 model_paths = [osp.join(model_dir, f"obj_{cls_idx:06d}.ply") for cls_idx in cls_indexes]
 texture_paths = None
 
