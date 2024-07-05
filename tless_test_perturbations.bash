@@ -34,8 +34,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # "brightness" "contrast" "elastic_transform" "pixelate" "jpeg_compression"
 # "speckle_noise" "gaussian_blur" "spatter" "saturate")
 
-#perturbations=("1" "2" "3" "4" "5")
-perturbations=("2")
+perturbations=("1" "2" "3" "4" "5")
+# perturbations=("2")
 #["gaussian_noise","shot_noise","motion_blur","brightness","gaussian_blur"]
 #noise_types=("gaussian_blur")
 #noise_types=("gaussian_noise" "shot_noise" "motion_blur" "brightness" "gaussian_blur")
