@@ -30,7 +30,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=10,
+    TOTAL_EPOCHS=20,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -42,12 +42,10 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("tless_5r_train_pbr",),
+    TRAIN=("tless_3r_train_pbr",),
     TEST=("tless_bop_test_primesense",),
-    DET_FILES_TEST=(
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",),
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/scene_gt_bb_dummy.json",),
-        "datasets/BOP_DATASETS/lmo/test/test_bboxes/yolox_x_640_lmo_pbr_lmo_bop_test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
 )
 
 MODEL = dict(
