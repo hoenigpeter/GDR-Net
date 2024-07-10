@@ -45,7 +45,7 @@ DATASETS = dict(
     #TRAIN=("itodd_24_train_pbr",),
     TEST=("itodd_bop_test",),
     #DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/gdrnppdet-pbr_itodd-test.json",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_itodd.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_itodd_random.json",),
 )
 
 DATALOADER = dict(

@@ -1,11 +1,15 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/lm_test/lmo_7r"
+OUTPUT_DIR = "output/gdrn/40_epochs/tless_random_texture_no_aug"
 INPUT = dict(
+    MIN_SIZE_TRAIN=540,
+    MAX_SIZE_TRAIN=720,
+    MIN_SIZE_TEST=540,
+    MAX_SIZE_TEST=720,
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
-    COLOR_AUG_PROB=0.8,
+    COLOR_AUG_PROB=0,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
         "Sequential(["
@@ -26,7 +30,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=40,
+    TOTAL_EPOCHS=20,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -38,14 +42,11 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    TRAIN=("lmo_7r_pbr_train",),
-    TEST=("lm_lmo_13_test",),
-    # AP	AP50	AR	inf.time
-    # 60.657	89.625	66.2	0.024449
-    DET_FILES_TEST=(
-        #"datasets/BOP_DATASETS/lmo/test/test_bboxes/faster_R50_FPN_AugCosyAAE_HalfAnchor_lmo_pbr_lmo_fuse_real_all_8e_test_480x640.json",
-        "datasets/BOP_DATASETS/lm/test/test_bboxes/bbox_faster_all.json",
-    ),
+    TRAIN=("tless_random_texture_train_pbr",),
+    TEST=("tless_bop_test_primesense",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
 )
 
 MODEL = dict(
@@ -79,20 +80,20 @@ MODEL = dict(
 )
 
 VAL = dict(
-    DATASET_NAME="lm",
+    DATASET_NAME="tless",
     SCRIPT_PATH="lib/pysixd/scripts/eval_pose_results_more.py",
     TARGETS_FILENAME="test_targets_bop19.json",
-    ERROR_TYPES="mspd,mssd,vsd,ad,reteS,reS,teS,projS",
+    ERROR_TYPES="mspd,mssd,vsd",
+    #ERROR_TYPES="mspd,mssd,vsd,ad,reS,teS",
     RENDERER_TYPE="egl",  # cpp, python, egl
     SPLIT="test",
     SPLIT_TYPE="",
-    N_TOP=1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
+    N_TOP=-1,  # SISO: 1, VIVO: -1 (for LINEMOD, 1/-1 are the same)
     EVAL_CACHED=False,  # if the predicted poses have been saved
     SCORE_ONLY=False,  # if the errors have been calculated
     EVAL_PRINT_ONLY=False,  # if the scores/recalls have been saved
     EVAL_PRECISION=False,  # use precision or recall
     USE_BOP=True,  # whether to use bop toolkit
 )
-
 
 TEST = dict(EVAL_PERIOD=0, VIS=False, TEST_BBOX_TYPE="est")  # gt | est

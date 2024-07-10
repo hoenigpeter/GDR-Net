@@ -16,8 +16,8 @@ done
 # itodd_variants=("itodd" "itodd_random_texture")
 # itodd_minus_variants=("itodd" "itodd-random-texture")
 
-itodd_variants=("itodd")
-itodd_minus_variants=("itodd")
+itodd_variants=("itodd_random_texture")
+itodd_minus_variants=("itodd-random-texture")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
