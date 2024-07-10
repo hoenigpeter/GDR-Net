@@ -9,7 +9,7 @@ INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
-    COLOR_AUG_PROB=0.8,
+    COLOR_AUG_PROB=0,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
         "Sequential(["
@@ -30,7 +30,7 @@ INPUT = dict(
 
 SOLVER = dict(
     IMS_PER_BATCH=24,
-    TOTAL_EPOCHS=40,
+    TOTAL_EPOCHS=20,
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -42,10 +42,11 @@ SOLVER = dict(
 )
 
 DATASETS = dict(
-    #TRAIN=("tless_random_texture_train_pbr",),
+    TRAIN=("tless_random_texture_train_pbr",),
     TEST=("tless_bop_test_primesense",),
     #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test_primesense/test_bboxes/yolox_x_640_tless_real_pbr_tless_bop_test.json",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/gdrnppdet-pbr_tless-test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/tless/test/test_bboxes/scene_gt_bb_dummy.json",),
 )
 
 MODEL = dict(

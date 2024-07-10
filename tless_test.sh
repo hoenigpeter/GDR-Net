@@ -16,12 +16,12 @@ done
 # tless_variants=("tless" "tless_random_texture")
 # tless_minus_variants=("tless" "tless-random-texture")
 
-tless_variants=("tless" "tless_random_texture")
-tless_minus_variants=("tless" "tless-random-texture")
+tless_variants=("tless_random_texture")
+tless_minus_variants=("tless-random-texture")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-Generate the single obj config files
+# Generate the single obj config files
 for variant in "${tless_variants[@]}"
 do
     # Loop through the object names and modify the config file

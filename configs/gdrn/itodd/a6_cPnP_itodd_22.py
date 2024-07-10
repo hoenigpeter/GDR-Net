@@ -1,6 +1,6 @@
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/40_epochs/itodd/22"
+OUTPUT_DIR = "output/gdrn/40_epochs/itodd_SO/22"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=False,
@@ -44,7 +44,8 @@ SOLVER = dict(
 DATASETS = dict(
     #TRAIN=("itodd_22_train_pbr",),
     TEST=("itodd_bop_test",),
-    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/gdrnppdet-pbr_itodd-test.json",),
+    #DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/gdrnppdet-pbr_itodd-test.json",),
+    DET_FILES_TEST=("datasets/BOP_DATASETS/itodd/test/test_bboxes/yolox_itodd.json",),
 )
 
 DATALOADER = dict(
