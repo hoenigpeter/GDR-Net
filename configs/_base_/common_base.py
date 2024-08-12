@@ -121,7 +121,7 @@ SOLVER = dict(
     POLY_POWER=0.9,  # poly power
     REL_STEPS=(0.5, 0.75),
     # checkpoint
-    CHECKPOINT_PERIOD=5,
+    CHECKPOINT_PERIOD=1,
     CHECKPOINT_BY_EPOCH=True,
     MAX_TO_KEEP=5,
     # Enable automatic mixed precision for training

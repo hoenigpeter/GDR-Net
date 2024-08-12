@@ -78,22 +78,24 @@ if __name__ == "__main__":
         else:
             axis = axes[row, col]  # Access the 2D array of axes
 
-        axis.plot(X, tless_total_ADD_list[i], color='purple', marker='s', label='TLESS Original')
-        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='TLESS Random Texture')
+        axis.plot(X, tless_total_ADD_list[i], color='purple', marker='s', label='Texture-biased GDR-Net on TLESS')
+        axis.plot(X, tless_random_total_ADD_list[i], color='blue', marker='o', label='Shape-biased GDR-Net on TLESS')
 
         axis.set_ylim(-0.05, 70)  # Set y-axis to range from 0 to 80
         axis.set_xlim(-0.05, 1.05)
 
         if num_rows == 1:
-            axes[col].set_xlabel('Severity', fontsize=14)
-            axes[0].set_ylabel('AR', fontsize=14)
-            axes[col].set_title(letter + ") " + directory, fontsize=16)
+            axes[col].set_xlabel('Severity', fontsize=16)
+            axes[0].set_ylabel('AR', fontsize=16)
+            axes[col].set_title(letter + ") " + directory, fontsize=18)
             axes[col].set_xticks(X)
+            axes[col].tick_params(axis='both', which='major', labelsize=12)
         else:
-            axes[row, col].set_xlabel('Severity', fontsize=14)
-            axes[row, 0].set_ylabel('AR', fontsize=14)
-            axes[row, col].set_title(letter + ") " + directory, fontsize=16)
+            axes[row, col].set_xlabel('Severity', fontsize=16)
+            axes[row, 0].set_ylabel('AR', fontsize=16)
+            axes[row, col].set_title(letter + ") " + directory, fontsize=18)
             axes[row, col].set_xticks(X)
+            axes[row, col].tick_params(axis='both', which='major', labelsize=12)
 
     # Hide empty subplots
     for i in range(len(perturbation_types_print), num_rows * num_cols):
